@@ -2813,16 +2813,11 @@ function renderInst(){
   if(!arr.length){tbody.innerHTML=`<tr><td colspan="8" class="table-empty">Δεν βρέθηκαν εγκαταστάσεις</td></tr>`;document.getElementById('inst-count').textContent='';return;}
   tbody.innerHTML=arr.map(i=>{
     const inactive=i.sfrагisi||i.anaklisi;
-    const getRowClass=(p)=>{
-    if(p.rejected) return 'row-phase4 clickable';
-    if(p.teliko) return 'row-phase3 clickable';
-    if(p.hm_exerx) return 'row-phase2 clickable';
-    return 'row-phase1 clickable';
-  };
+    const rowCls3=inactive?'row-phase4 clickable':'clickable';
     const lockBadge=inactive?'<span title="'+(i.sfrагisi?'Σε Σφράγιση':'')+(i.sfrагisi&&i.anaklisi?' / ':'')+(i.anaklisi?'Σε Ανάκληση ΑΛ':'')+'"> 🔒</span>':'';
     const today2=new Date(); today2.setHours(0,0,0,0);
     const adeiaBadge=i.adeia_lixis&&new Date(i.adeia_lixis)<today2?'<span title="Ληγμένη Άδεια: '+fmtDate(i.adeia_lixis)+'" style="color:#f97316"> ⚠️</span>':'';
-    return `<tr style="${rowStyle}">
+    return `<tr class="${rowCls3}">
     <td class="mono">${esc(i.fak)}${lockBadge}${adeiaBadge}</td>
     <td><strong>${esc(i.name)}</strong></td>
     <td>${esc(i.topothesia)}</td>
@@ -3223,19 +3218,9 @@ function renderProto(){
   if(!arr.length){tbody.innerHTML=`<tr><td colspan="11" class="table-empty">Δεν βρέθηκαν κινήσεις</td></tr>`;document.getElementById('proto-count').textContent='';return;}
   tbody.innerHTML=arr.map(p=>{
     const isRejected=p.rejected;
-    // Χρωματική ένδειξη 3 φάσεων
-    let rowStyle='';
+    const rowCls=isRejected?'row-phase4':p.teliko?'row-phase3':p.hm_exerx?'row-phase2':'row-phase1';
     let phaseIndicator='';
-    if(isRejected){
-      rowStyle='background:#fee2e2;border-left:4px solid #ef4444;color:#7f1d1d';
-      phaseIndicator='';
-    } else if(p.teliko){
-      // Υπογεγραμμένο
-      rowStyle='background:#f0fdf4;border-left:4px solid #22c55e';
-    } else if(p.hm_exerx){
-      // Προς Υπογραφές
-      rowStyle='background:#eff6ff;border-left:4px solid #3b82f6';
-    }
+    if(isRejected){ phaseIndicator=''; }
     // Φάση 1 — χωρίς χρώμα (μόνο χρέωση)
     const teliko=isRejected?
                  `<span class="badge badge-red">❌ Απορρίφθηκε${p.rejected_date?' '+fmtDate(p.rejected_date):''}</span>`:
@@ -3243,7 +3228,7 @@ function renderProto(){
                  p.hm_exerx?`<span class="badge badge-blue">🔵 Προς Υπογραφές</span>`:
                  p.hm_xreosis?`<span class="badge badge-gray">⬜ Προς Ενέργεια</span>`:
                  `<span class="badge badge-gray">Νέο</span>`;
-    return `<tr style="${rowStyle}">
+    return `<tr class="${rowCls} clickable">
       <td class="mono"><strong>${esc(p.fak)}</strong></td>
       <td class="mono muted">${esc(p.proto_eisx)}</td>
       <td class="mono">${fmtDate(p.hm_xreosis)}</td>
@@ -4015,7 +4000,7 @@ function renderEquip(){
     const dianStr=(e.pumps||[]).length
       ?(e.pumps.filter(function(p){return p.type==='Διανομέας';}).length||'—')
       :(e.dian_lpg_cng||'—');
-    return `<tr class="clickable" onclick="openEquipModal('${esc(e.fak)}')" title="Κλικ για επεξεργασία">
+    return `<tr style="cursor:pointer;" onclick="openEquipModal('${esc(e.fak)}')" title="Κλικ για επεξεργασία">
       <td class="mono"><strong>${esc(e.fak)}</strong></td>
       <td class="muted" style="font-size:11px">${pumpsStr}</td>
       <td class="muted" style="font-size:11px">${tanksStr}</td>
@@ -4511,7 +4496,7 @@ function renderInstStats(){
   }
   tbody.innerHTML=arr.map(function(i){
     const inactive=i.sfrагisi||i.anaklisi;
-    const rowStyle=inactive?'background:#fee2e2;':'';
+    const rowClass2=inactive?'row-phase4 clickable':'clickable';
     const status=inactive?
       '<span style="color:#dc2626;font-weight:600">🔒 '+(i.sfrагisi?'Σφράγιση':'')+(i.sfrагisi&&i.anaklisi?'/':'')+(i.anaklisi?'Ανάκληση':'')+'</span>':
       '<span style="color:#16a34a">✅ Ενεργή</span>';
@@ -4525,7 +4510,7 @@ function renderInstStats(){
     if(eq.offset_filling) equipBadges.push('Offset');
     if(eq.auto_politis) equipBadges.push('Αυτ.Πωλητής');
     if(eq.lakkos) equipBadges.push('Λάκκος');
-    return '<tr style="'+rowStyle+'">'
+    return '<tr class="clickable">'
       +'<td class="mono"><strong>'+esc(i.fak)+'</strong></td>'
       +'<td>'+esc(i.name)+'</td>'
       +'<td>'+esc(i.topothesia||'')+'</td>'
