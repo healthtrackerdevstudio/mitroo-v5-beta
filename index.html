@@ -399,7 +399,183 @@ table{width:100%;border-collapse:collapse}
   #modal-cert  > .modal,
   #modal-proto > .modal{max-width:100%;width:100%}
 }
+
+/* ── Modal z-index above Leaflet (popupPane=700) ── */
+.modal-overlay{z-index:1100 !important}
+/* Note: Leaflet's internal pane z-indexes (tilePane 200 … popupPane 700)
+   are left untouched. Modal at 1100 sits cleanly above them. */
+
 /* ═══════════ END v5.0 MODAL FIXES ═══════════ */
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v5.0 HOME (Αρχική) FIXES
+   - .stats-grid (HTML) ≠ .stat-grid (CSS) → grid never activated
+   - .stat-value/.stat-label (HTML) ≠ .stat-val/.stat-lbl (CSS)
+   - .stat-icon never defined
+   ──────────────────────────────────────────────────────────────────── */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+  padding:18px;
+}
+.stats-grid .stat-card{
+  background:#fff;
+  border-radius:12px;
+  border:1px solid #e2e8f0;
+  padding:16px 18px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  text-align:left;
+  transition:transform .15s,box-shadow .15s,border-color .15s;
+  cursor:default;
+}
+.stats-grid .stat-card:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(15,30,60,.08);
+  border-color:#cbd5e1;
+}
+.stat-icon{
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  flex-shrink:0;
+  background:#f1f5f9;
+}
+.stat-icon.blue   {background:#dbeafe;color:#1e40af}
+.stat-icon.orange {background:#ffedd5;color:#9a3412}
+.stat-icon.green  {background:#dcfce7;color:#166534}
+.stat-icon.red    {background:#fee2e2;color:#991b1b}
+.stat-icon.purple {background:#ede9fe;color:#5b21b6}
+.stats-grid .stat-card > div:last-child{flex:1;min-width:0}
+.stat-value{
+  font-size:24px;
+  font-weight:600;
+  color:#1a1f2e;
+  line-height:1.1;
+  font-feature-settings:'tnum';
+}
+.stat-label{
+  font-size:11px;
+  color:#64748b;
+  margin-top:3px;
+  font-weight:500;
+  letter-spacing:0.3px;
+  text-transform:uppercase;
+}
+/* Gold left-accent on first card to echo the brand stripe */
+.stats-grid .stat-card:first-child{border-left:3px solid #e8a020}
+
+/* Recent protocol section on Home */
+.recent-section{background:#fff;border-top:1px solid #e2e8f0;margin-top:8px}
+.recent-header{
+  padding:12px 18px;
+  font-size:12px;
+  font-weight:600;
+  color:#1a3a6b;
+  border-bottom:1px solid #f1f5f9;
+  text-transform:uppercase;
+  letter-spacing:0.4px;
+}
+#recent-list{padding:6px 0}
+#recent-list .recent-item{
+  padding:9px 18px;
+  font-size:13px;
+  color:#374151;
+  border-bottom:1px solid #f1f5f9;
+  cursor:pointer;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  transition:background .12s;
+}
+#recent-list .recent-item:last-child{border-bottom:none}
+#recent-list .recent-item:hover{background:#f8fafc}
+/* ═══════════ END HOME FIXES ═══════════ */
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v5.0 EQUIPMENT TABLE — column widths + pill rendering
+   ──────────────────────────────────────────────────────────────────── */
+#view-equip .tbl{table-layout:fixed;width:100%}
+#view-equip .tbl col.eq-c-fak   {width:90px}
+#view-equip .tbl col.eq-c-pumps {width:25%}
+#view-equip .tbl col.eq-c-tanks {width:34%}
+#view-equip .tbl col.eq-c-dian  {width:80px}
+#view-equip .tbl col.eq-c-heo   {width:70px}
+#view-equip .tbl col.eq-c-extra {width:auto}
+#view-equip .tbl col.eq-c-act   {width:80px}
+#view-equip .tbl td{vertical-align:middle;padding:8px 10px}
+#view-equip .tbl td .muted{color:#64748b}
+
+/* Equipment cell building blocks */
+.eq-cell{display:flex;flex-direction:column;gap:4px;min-width:0}
+.eq-cell-head{
+  font-size:12px;
+  color:#1a1f2e;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-feature-settings:'tnum';
+}
+.eq-cell-head .eq-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:22px;
+  height:20px;
+  padding:0 6px;
+  border-radius:10px;
+  background:#1a3a6b;
+  color:#fff;
+  font-size:11px;
+  font-weight:600;
+}
+.eq-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px;
+}
+.eq-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 7px;
+  border-radius:5px;
+  background:#f1f5f9;
+  color:#475569;
+  font-size:10.5px;
+  font-weight:500;
+  font-family:'IBM Plex Sans',sans-serif;
+  line-height:1.4;
+  white-space:nowrap;
+}
+.eq-pill strong{color:#1a1f2e;font-weight:600;font-feature-settings:'tnum'}
+/* Fuel-typed pills */
+.eq-pill.f-DTH,.eq-pill.f-DΘ   {background:#fef3c7;color:#854d0e}
+.eq-pill.f-U95                 {background:#dcfce7;color:#166534}
+.eq-pill.f-U98                 {background:#dbeafe;color:#1e40af}
+.eq-pill.f-Dk                  {background:#fce7f3;color:#9d174d}
+.eq-pill.f-LPG                 {background:#ede9fe;color:#5b21b6}
+.eq-pill.f-CNG                 {background:#cffafe;color:#155e75}
+.eq-pill.f-DTH strong,.eq-pill.f-DΘ strong{color:#78350f}
+.eq-pill.f-U95 strong{color:#14532d}
+.eq-pill.f-U98 strong{color:#1e3a8a}
+.eq-pill.f-Dk  strong{color:#831843}
+.eq-pill.f-LPG strong{color:#4c1d95}
+.eq-pill.f-CNG strong{color:#0e4d57}
+
+.eq-empty{color:#cbd5e1;font-size:14px}
+.eq-num{font-size:14px;font-weight:600;color:#1a1f2e;font-feature-settings:'tnum'}
+.eq-num-sub{font-size:10px;color:#94a3b8;margin-top:1px}
+/* ═══════════ END EQUIPMENT FIXES ═══════════ */
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
@@ -871,6 +1047,15 @@ const MiniDocGen = {
       </div>
       <div class="table-wrap">
         <table class="tbl">
+          <colgroup>
+            <col class="eq-c-fak">
+            <col class="eq-c-pumps">
+            <col class="eq-c-tanks">
+            <col class="eq-c-dian">
+            <col class="eq-c-heo">
+            <col class="eq-c-extra">
+            <col class="eq-c-act">
+          </colgroup>
           <thead><tr>
             <th>ΦΑΚ</th>
             <th>Αντλίες</th>
@@ -4177,28 +4362,98 @@ function renderEquip(){
   const tbody=document.getElementById('equip-tbody');
   if(!tbody)return;
   if(!arr.length){tbody.innerHTML=`<tr><td colspan="7" class="table-empty">Δεν βρέθηκαν εγγραφές εξοπλισμού</td></tr>`;document.getElementById('equip-count').textContent='';return;}
+
+  // Helper: map fuel name to a CSS class slug (Greek-safe)
+  const fuelClass=f=>{
+    const s=String(f||'').trim();
+    if(/^DΘ$|^DTH$|Diesel|Πετρ/i.test(s)) return 'f-DTH';
+    if(/^U95\b|^Unleaded\s*95|^Β95|^95\b/i.test(s)) return 'f-U95';
+    if(/^U98\b|^98\b|Premium/i.test(s)) return 'f-U98';
+    if(/^Dk\b|Kero|Κηρ/i.test(s)) return 'f-Dk';
+    if(/LPG|Υγρ/i.test(s)) return 'f-LPG';
+    if(/CNG|Φυσ/i.test(s)) return 'f-CNG';
+    return '';
+  };
+  const fmtL=n=>Number(n||0).toLocaleString('el-GR',{maximumFractionDigits:0});
+
   tbody.innerHTML=arr.map(e=>{
+    // ── ΑΝΤΛΙΕΣ: count + breakdown pills ─────────────────────────
+    const pumps=e.pumps||[];
+    let pumpsCell='<span class="eq-empty">—</span>';
+    if(pumps.length){
+      const byType={};
+      pumps.forEach(p=>{
+        const k=[p.type,p.eidos].filter(Boolean).join(' ').trim()||'—';
+        byType[k]=(byType[k]||0)+1;
+      });
+      const pills=Object.entries(byType)
+        .map(([k,n])=>`<span class="eq-pill">${n}× ${esc(k)}</span>`).join('');
+      pumpsCell=`<div class="eq-cell">
+        <div class="eq-cell-head"><span class="eq-count">${pumps.length}</span> ${pumps.length===1?'αντλία':'αντλίες'}</div>
+        <div class="eq-pills">${pills}</div>
+      </div>`;
+    } else if(e.antlies){
+      pumpsCell=`<div class="eq-cell"><div class="eq-cell-head"><span class="eq-count">${esc(e.antlies)}</span></div></div>`;
+    }
+
+    // ── ΔΕΞΑΜΕΝΕΣ: count + total + fuel pills ────────────────────
+    const tanks=e.tanks||[];
+    let tanksCell='<span class="eq-empty">—</span>';
+    if(tanks.length){
+      const fuelAgg={}; // {fuel: {liters, count}}
+      tanks.forEach(t=>{
+        const f=t.fuel||'?';
+        if(!fuelAgg[f]) fuelAgg[f]={liters:0,count:0};
+        fuelAgg[f].liters+=Number(t.liters||0);
+        fuelAgg[f].count++;
+      });
+      const grand=Object.values(fuelAgg).reduce((s,v)=>s+v.liters,0);
+      const pills=Object.entries(fuelAgg)
+        .sort((a,b)=>b[1].liters-a[1].liters)
+        .map(([f,v])=>`<span class="eq-pill ${fuelClass(f)}" title="${v.count} δεξ.">${esc(f)} <strong>${fmtL(v.liters)}L</strong></span>`)
+        .join('');
+      tanksCell=`<div class="eq-cell">
+        <div class="eq-cell-head"><span class="eq-count">${tanks.length}</span> δεξ. · <span style="color:#475569;font-weight:500">${fmtL(grand)} L</span></div>
+        <div class="eq-pills">${pills}</div>
+      </div>`;
+    }
+
+    // ── ΔΙΑΝ. LPG/CNG ────────────────────────────────────────────
+    const dianCount=(e.pumps||[]).filter(p=>p.type==='Διανομέας').length || e.dian_lpg_cng || 0;
+    const dianCell=dianCount
+      ? `<div class="eq-num">${esc(dianCount)}</div>`
+      : '<span class="eq-empty">—</span>';
+
+    // ── ΗΕΟ (φορτιστές) ──────────────────────────────────────────
+    const heoCell=e.fortistes
+      ? `<div class="eq-num">${esc(e.fortistes)}</div>${e.fortistes_theseis?`<div class="eq-num-sub">${esc(e.fortistes_theseis)} θέσ.</div>`:''}`
+      : '<span class="eq-empty">—</span>';
+
+    // ── ΕΞΤΡΑ ───────────────────────────────────────────────────
     const extras=[];
-    if(e.plyntirio)extras.push('Πλυντ.'+(e.anif_plyntirio?' ↑':''));
-    if(e.lipantirio)extras.push('Λιπαντ.'+(e.anif_lipantirio?' ↑':''));
-    if(e.artho25)extras.push('Αρ.25');
-    if(e.artho27)extras.push('Αρ.27');
-    (e.extra_equip||[]).forEach(x=>extras.push(x));
-    const tanksStr=(e.tanks||[]).map(t=>`${t.mitroo?'['+t.mitroo+'] ':''}${t.fuel||'?'} ${t.liters?Number(t.liters).toFixed(0)+'L':''}`).join(' | ')||'—';
-    const pumpsStr=(e.pumps||[]).length
-      ?(e.pumps.map(function(p){return [p.type,p.eidos].filter(Boolean).join(' ');}).join(' | '))
-      :(e.antlies?e.antlies+' αντλίες':'—');
-    const dianStr=(e.pumps||[]).length
-      ?(e.pumps.filter(function(p){return p.type==='Διανομέας';}).length||'—')
-      :(e.dian_lpg_cng||'—');
-    return `<tr style="cursor:pointer;" onclick="openEquipModal('${esc(e.fak)}')" title="Κλικ για επεξεργασία">
+    if(e.plyntirio) extras.push('Πλυντ.'+(e.anif_plyntirio?' ↑':''));
+    if(e.lipantirio) extras.push('Λιπαντ.'+(e.anif_lipantirio?' ↑':''));
+    if(e.artho25) extras.push('Αρ.25');
+    if(e.artho27) extras.push('Αρ.27');
+    if(e.stage2) extras.push('Stage II');
+    if(e.pezodromiko) extras.push('Πεζοδρ.');
+    if(e.steg_freatia) extras.push('Στεγ.Φρ.');
+    if(e.offset_filling) extras.push('Offset');
+    if(e.auto_politis) extras.push('Αυτ.Πωλ.');
+    if(e.lakkos) extras.push('Λάκκος');
+    (e.extra_equip||[]).forEach(x=>{ if(x) extras.push(x); });
+    const extraCell=extras.length
+      ? `<div class="eq-pills">${extras.map(x=>`<span class="eq-pill">${esc(x)}</span>`).join('')}</div>`
+      : '<span class="eq-empty">—</span>';
+
+    return `<tr class="clickable" onclick="openEquipModal('${esc(e.fak)}')" title="Κλικ για επεξεργασία">
       <td class="mono"><strong>${esc(e.fak)}</strong></td>
-      <td class="muted" style="font-size:11px">${pumpsStr}</td>
-      <td class="muted" style="font-size:11px">${tanksStr}</td>
-      <td class="muted">${dianStr}</td>
-      <td class="muted">${e.fortistes||'—'}${e.fortistes_theseis?' ('+e.fortistes_theseis+' θέσ.)':''}</td>
-      <td style="font-size:11px">${extras.map(x=>`<span class="badge badge-gray">${x}</span>`).join(' ')}</td>
-      <td class="actions">
+      <td>${pumpsCell}</td>
+      <td>${tanksCell}</td>
+      <td style="text-align:center">${dianCell}</td>
+      <td style="text-align:center">${heoCell}</td>
+      <td>${extraCell}</td>
+      <td class="actions" onclick="event.stopPropagation()" style="white-space:nowrap;text-align:right">
         <button class="btn-icon" onclick="openEquipModal('${esc(e.fak)}')" title="Επεξεργασία">✏️</button>
         <button class="btn-icon" onclick="confirmDelete('Διαγραφή εξοπλισμού «${esc(e.fak)}»;',()=>deleteEquip('${esc(e.fak)}'))" title="Διαγραφή">🗑</button>
       </td>
