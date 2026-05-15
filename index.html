@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.07
+  Έκδοση: v5.08
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.07</title>
+<title>Μητρώο Εγκαταστάσεων v5.08</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -788,7 +788,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.07</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.08</p>
   </div>
 </div>
 
@@ -796,7 +796,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.07</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.08</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -1023,6 +1023,7 @@ const MiniDocGen = {
         </div>
         <div class="toolbar-spacer"></div>
         <button class="btn btn-secondary btn-sm" onclick="exportProtoCSV()">⬇ CSV</button>
+        <button class="btn btn-secondary btn-sm" onclick="openCleanupModal()" title="Ενοποίηση παραλλαγών λεξιλογίου (Αίτημα / Τελ.Εξ.Ενέργεια)">🧹 Εξυγίανση</button>
         <button class="btn btn-primary" onclick="openProtoModal()">+ Νέα Κίνηση</button>
       </div>
       <div class="table-wrap">
@@ -2042,6 +2043,62 @@ const MiniDocGen = {
   </div>
 </div>
 
+<!-- ══ MODAL: CLEANUP VOCABULARY (v5.08) ══ -->
+<div class="modal-overlay" id="modal-cleanup">
+  <div class="modal" style="max-width:960px">
+    <div class="modal-header">
+      <span class="modal-title">🧹 Εξυγίανση Λεξιλογίου Πρωτοκόλλου</span>
+      <button class="modal-close" onclick="closeModal('modal-cleanup')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#475569;margin:0 0 12px">
+        Ενοποιεί παραλλαγές που έχουν καταχωρηθεί στα πεδία <strong>Αίτημα</strong> και <strong>Τελική Εξ. Ενέργεια</strong> ώστε το ίδιο νόημα να γράφεται με τον ίδιο τρόπο. Επηρεάζει μόνο εγγραφές που ταιριάζουν με το παρακάτω mapping.
+      </p>
+
+      <!-- Mapping table -->
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0;margin-bottom:14px;overflow:hidden">
+        <div style="padding:10px 14px;background:#1a3a6b;color:#fff;font-size:12px;font-weight:600;letter-spacing:0.3px;text-transform:uppercase">📋 Mapping Παραλλαγών</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:#fff;border-bottom:1px solid #e2e8f0">
+              <th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase">Παραλλαγές που εντοπίζονται</th>
+              <th style="padding:8px 10px;width:40px"></th>
+              <th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase">Κανονική μορφή</th>
+            </tr>
+          </thead>
+          <tbody id="cleanup-mapping-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Preview summary -->
+      <div id="cleanup-summary" style="background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:10px 14px;font-size:13px;color:#1e3a8a;margin-bottom:12px"></div>
+
+      <!-- Preview table -->
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
+        <div style="padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:12px;font-weight:600;color:#1a1f2e;letter-spacing:0.3px;text-transform:uppercase">🔍 Preview Αλλαγών</div>
+        <div style="max-height:380px;overflow-y:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead style="position:sticky;top:0;background:#fff;z-index:1">
+              <tr style="border-bottom:1px solid #e2e8f0">
+                <th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase">ΦΑΚ</th>
+                <th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase">Πεδίο</th>
+                <th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase">Πριν</th>
+                <th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase">Μετά</th>
+              </tr>
+            </thead>
+            <tbody id="cleanup-preview-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span style="flex:1;font-size:11px;color:#94a3b8">💡 Η ενέργεια αποθηκεύεται και συγχρονίζεται στο Firebase.</span>
+      <button class="btn btn-secondary" onclick="closeModal('modal-cleanup')">Άκυρο</button>
+      <button class="btn btn-primary" id="cleanup-apply-btn" onclick="applyCleanup()">✓ Εφαρμογή</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 <script>
@@ -2239,6 +2296,128 @@ let engineers_dynamic=[...engineers];
 let aitions_list=[];
 const aitimata_list_defaults=['Άδεια Δόμησης','Άδεια Εγκατάστασης','Άδεια Λειτουργίας','Ανανέωση Άδειας','Αυτοψία','ΒΗΕ','Γνωμοδότηση','Διοικητική Πράξη','Έγγραφη Απάντηση','Έγκριση Σχεδίων','Έλεγχος','Εγκατάσταση GPL','Εγκατάσταση CNG','Καταγγελία','Κυκλοφοριακή Σύνδεση','Μετρολογία','Ογκομετρικός Πίνακας','Πιστοποιητικό Πυροπροστασίας','Τακτοποίηση','Τροποποίηση Άδειας','ΥΔΕ','Χορήγηση Άδειας'];
 let aitimata_list=[...aitimata_list_defaults];
+
+// ══ PROTOCOL VOCABULARY CANONICALIZATION (v5.08) ══
+// Extensible map: canonical → variants. Both Αίτημα και Τελική Εξ. Ενέργεια
+// τραβάνε από την ίδια λίστα, οπότε το cleanup ενοποιεί παραλλαγές χρηστών
+// που μολύνουν το autocomplete (ΑΔ ΛΕΙΤ, Αδ Λειτ, Αδεια Λετουργίας...).
+// Variants γράφονται normalized (πεζά, χωρίς τόνους/τελείες). Δες _normGr().
+const PROTO_CANON_MAP=[
+  {
+    canonical:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ',
+    variants:[
+      'αδ λειτ',
+      'αδ λειτουργιας',
+      'αδ λειτουργιας',
+      'αδεια λειτουργιας',
+      'αδεια λετουργιας',   // typo missing 'ι'
+      'α λειτουργιας',
+    ]
+  }
+  // Επόμενες ομάδες προστίθενται εδώ:
+  // { canonical:'ΑΔ ΙΔΡΥΣΗΣ', variants:['αδ ιδρ','αδεια ιδρυσης',...] },
+  // { canonical:'ΑΛΛ ΔΙΚΑΙΟΥΧΟΥ', variants:['αλλ δικ','αλλαγη δικαιουχου',...] },
+];
+
+// Normalize Greek text για robust comparison:
+// — lowercase, αφαίρεση τόνων/διαλυτικών, dots→space, collapse multiple spaces, trim
+function _normGr(s){
+  if(!s) return '';
+  let x=String(s).toLowerCase();
+  x=x.replace(/[άΆ]/g,'α').replace(/[έΈ]/g,'ε').replace(/[ήΉ]/g,'η')
+     .replace(/[ίΊϊΐ]/g,'ι').replace(/[όΌ]/g,'ο').replace(/[ύΎϋΰ]/g,'υ').replace(/[ώΏ]/g,'ω');
+  x=x.replace(/[.,·]/g,' ').replace(/\s+/g,' ').trim();
+  return x;
+}
+
+// Επιστρέφει την canonical μορφή ή null αν δεν ανήκει σε ομάδα.
+// Idempotent: αν η τιμή είναι ήδη canonical, επιστρέφει την ίδια.
+function _findCanonical(value){
+  const n=_normGr(value);
+  if(!n) return null;
+  for(const grp of PROTO_CANON_MAP){
+    if(grp.variants.includes(n)) return grp.canonical;
+    if(n===_normGr(grp.canonical)) return grp.canonical;
+  }
+  return null;
+}
+
+// Σαρώνει το protocol για παραλλαγές. dryRun=true → preview μόνο.
+// Επιστρέφει {aitima:[{idx,fak,from,to}], energeia:[...]}.
+function cleanupProtoVocab(dryRun){
+  const changes={aitima:[], energeia:[]};
+  protocol.forEach(function(p,idx){
+    if(p.aitima){
+      const canon=_findCanonical(p.aitima);
+      if(canon && p.aitima!==canon){
+        changes.aitima.push({idx:idx, fak:p.fak||'?', from:p.aitima, to:canon});
+        if(!dryRun) p.aitima=canon;
+      }
+    }
+    if(p.energeia){
+      const canon=_findCanonical(p.energeia);
+      if(canon && p.energeia!==canon){
+        changes.energeia.push({idx:idx, fak:p.fak||'?', from:p.energeia, to:canon});
+        if(!dryRun) p.energeia=canon;
+      }
+    }
+  });
+  return changes;
+}
+
+// Ανοίγει το cleanup modal με preview των αλλαγών
+function openCleanupModal(){
+  if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
+  const changes=cleanupProtoVocab(true);
+  const total=changes.aitima.length+changes.energeia.length;
+  const tbody=document.getElementById('cleanup-preview-tbody');
+  const summary=document.getElementById('cleanup-summary');
+  const applyBtn=document.getElementById('cleanup-apply-btn');
+  // Mapping table
+  const mapHtml=PROTO_CANON_MAP.map(function(g){
+    return '<tr><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">'
+      +g.variants.map(function(v){return '<span class="badge badge-gray" style="margin:1px">'+esc(v)+'</span>';}).join(' ')
+      +'</td><td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;text-align:center;color:#94a3b8">→</td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid #f1f5f9"><strong style="color:#1a3a6b">'+esc(g.canonical)+'</strong></td></tr>';
+  }).join('');
+  document.getElementById('cleanup-mapping-tbody').innerHTML=mapHtml;
+  // Preview body
+  if(total===0){
+    summary.innerHTML='<span style="color:#15803d;font-weight:600">✓ Όλες οι εγγραφές είναι ήδη κανονικοποιημένες</span> — δεν χρειάζεται καμία αλλαγή.';
+    tbody.innerHTML='<tr><td colspan="4" style="padding:20px;text-align:center;color:#94a3b8">Καμία αλλαγή</td></tr>';
+    applyBtn.disabled=true;
+    applyBtn.style.opacity='0.5';
+  } else {
+    summary.innerHTML='<strong>'+total+' εγγραφές</strong> θα ενημερωθούν: '
+      +'<span class="badge badge-blue">'+changes.aitima.length+' στο Αίτημα</span> '
+      +'<span class="badge badge-purple">'+changes.energeia.length+' στην Τελ. Εξ. Ενέργεια</span>';
+    const rows=[].concat(
+      changes.aitima.map(function(c){return Object.assign({field:'Αίτημα'},c);}),
+      changes.energeia.map(function(c){return Object.assign({field:'Τελ.Ενέργεια'},c);})
+    );
+    tbody.innerHTML=rows.slice(0,500).map(function(c){
+      return '<tr><td class="mono" style="padding:5px 10px;border-bottom:1px solid #f1f5f9;font-size:11px">'+esc(c.fak)+'</td>'
+        +'<td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;font-size:11px"><span class="badge '+(c.field==='Αίτημα'?'badge-blue':'badge-purple')+'">'+c.field+'</span></td>'
+        +'<td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#dc2626">'+esc(c.from)+'</td>'
+        +'<td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#15803d;font-weight:600">'+esc(c.to)+'</td></tr>';
+    }).join('') + (rows.length>500?'<tr><td colspan="4" style="padding:8px;text-align:center;color:#94a3b8;font-size:11px">… και άλλες '+(rows.length-500)+' γραμμές</td></tr>':'');
+    applyBtn.disabled=false;
+    applyBtn.style.opacity='1';
+  }
+  openModal('modal-cleanup');
+}
+
+function applyCleanup(){
+  const changes=cleanupProtoVocab(false); // false = apply
+  save('proto',protocol);
+  // Rebuild autocomplete list απαλλαγμένη από τις παλιές παραλλαγές
+  aitimata_list=[...new Set([...aitimata_list_defaults,...protocol.map(p=>p.aitima).filter(Boolean),...protocol.map(p=>p.energeia).filter(Boolean)])].sort();
+  closeModal('modal-cleanup');
+  toast('✅ Εφαρμόστηκαν '+(changes.aitima.length+changes.energeia.length)+' αλλαγές','success');
+  if(typeof renderProto==='function') renderProto();
+  if(typeof renderStats==='function') renderStats();
+}
+// ══ END VOCABULARY CANONICALIZATION ══
 
 
 // ══ SERVER MODE DETECTION ══
@@ -2455,7 +2634,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.07',
+    version:'v5.08',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -2504,7 +2683,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.07',
+    version:'v5.08',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -2693,13 +2872,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.07',
+      version:'v5.08',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.07',
+      version:'v5.08',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -5178,7 +5357,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.07</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.08</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
