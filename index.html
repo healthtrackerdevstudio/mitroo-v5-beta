@@ -576,6 +576,64 @@ table{width:100%;border-collapse:collapse}
 .eq-num{font-size:14px;font-weight:600;color:#1a1f2e;font-feature-settings:'tnum'}
 .eq-num-sub{font-size:10px;color:#94a3b8;margin-top:1px}
 /* ═══════════ END EQUIPMENT FIXES ═══════════ */
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v5.0 ROUND 3 FIXES — 2026-05-15
+   1. .dd-wrap missing position:relative → dd-panels escape their wrapper
+   3. No :active state on buttons → no click feedback
+   4. Row borders too faint (#f1f5f9 ≈ invisible), hover too pale
+   5. Installation rows need .clickable behavior on whole row
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Fix #1 — dropdown wrapper must position the absolute panel */
+.dd-wrap{position:relative;display:inline-block}
+.dd-panel{
+  /* Stronger panel styling so it stands out as a real overlay */
+  border:1px solid #cbd5e1;
+  box-shadow:0 8px 24px rgba(15,30,60,.12);
+  z-index:80;
+}
+
+/* Fix #3 — visible click feedback on all buttons */
+.btn{transition:background .12s,color .12s,border-color .12s,transform .08s,box-shadow .12s}
+.btn:active{transform:translateY(1px) scale(.98)}
+.btn-primary:active{background:#0a1e4a;box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
+.btn-secondary:active{background:#e2e8f0;box-shadow:inset 0 2px 4px rgba(0,0,0,.08)}
+.btn-success:active{background:#14532d;box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
+.btn-danger:active{background:#7f1d1d;box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
+.btn-warning:active{background:#92400e;box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
+.btn-icon:active{background:#cbd5e1;transform:translateY(1px)}
+.topbar-btn:active{transform:translateY(1px);background:rgba(255,255,255,0.28)}
+/* Focus ring for keyboard a11y */
+.btn:focus-visible{outline:2px solid #e8a020;outline-offset:2px}
+
+/* Fix #4 — Stronger, visible row separators + bolder hover */
+.tbl tbody tr{border-bottom:1px solid #e2e8f0}
+.tbl tbody tr:last-child{border-bottom:none}
+.tbl tbody tr.clickable{cursor:pointer}
+/* Stronger hover for clickable rows — clearly visible blue tint */
+.tbl tbody tr.clickable:hover{
+  background:#dbeafe !important;
+  box-shadow:inset 3px 0 0 #1a3a6b;
+}
+/* Keep the phased-row backgrounds but make hover dominant */
+.tbl tbody tr.row-phase1:hover{background:#fef08a !important;box-shadow:inset 3px 0 0 #ca8a04}
+.tbl tbody tr.row-phase2:hover{background:#bfdbfe !important;box-shadow:inset 3px 0 0 #1d4ed8}
+.tbl tbody tr.row-phase3:hover{background:#bbf7d0 !important;box-shadow:inset 3px 0 0 #15803d}
+.tbl tbody tr.row-phase4:hover{background:#fecaca !important;box-shadow:inset 3px 0 0 #b91c1c}
+/* Slightly stronger alternating row hint (subtle zebra) */
+.tbl tbody tr:nth-child(even):not([class*="row-phase"]){background:#fbfcfd}
+/* Make actions cell not pop the row hover when hovering icons */
+.tbl td.actions{white-space:nowrap;text-align:right}
+.tbl td.actions .btn-icon{margin-left:2px}
+
+/* qnav bars — keep border + bg subtle even when always-shown */
+[id^="qnav-"]{transition:opacity .15s}
+[id^="qnav-"].nofak{opacity:0.6}
+[id^="qnav-"].nofak .btn{cursor:not-allowed;color:#94a3b8;background:#f8fafc}
+
+/* ═══════════ END ROUND 3 FIXES ═══════════ */
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
@@ -3193,7 +3251,7 @@ function renderInst(){
     const lockBadge=inactive?'<span title="'+(i.sfrагisi?'Σε Σφράγιση':'')+(i.sfrагisi&&i.anaklisi?' / ':'')+(i.anaklisi?'Σε Ανάκληση ΑΛ':'')+'"> 🔒</span>':'';
     const today2=new Date(); today2.setHours(0,0,0,0);
     const adeiaBadge=i.adeia_lixis&&new Date(i.adeia_lixis)<today2?'<span title="Ληγμένη Άδεια: '+fmtDate(i.adeia_lixis)+'" style="color:#f97316"> ⚠️</span>':'';
-    return `<tr class="${rowCls3}">
+    return `<tr class="${rowCls3}" onclick="openInstModal('${esc(i.fak)}')" title="Κλικ για επεξεργασία">
     <td class="mono">${esc(i.fak)}${lockBadge}${adeiaBadge}</td>
     <td><strong>${esc(i.name)}</strong></td>
     <td>${esc(i.topothesia)}</td>
@@ -3201,7 +3259,7 @@ function renderInst(){
     <td>${typeTag(i.type,i.subtype)}</td>
     <td>${i.cat?`<span class="badge ${i.cat==='ΔΧ'?'badge-blue':'badge-orange'}">${i.cat}</span>`:''}</td>
     <td class="muted" style="font-size:11px">${esc(i.adeia)}</td>
-    <td class="actions">
+    <td class="actions" onclick="event.stopPropagation()">
       ${i.coords?'<button class="btn-icon" onclick="openInstMap(\''+esc(i.coords)+'\',\''+esc(i.name||i.fak)+'\')" title="Άνοιγμα σε χάρτη">📍</button>':''}
       ${i.maps_link?'<button class="btn-icon" onclick="openKmlLink(this)" data-path="'+esc(i.maps_link)+'" title="Άνοιγμα/Αντιγραφή KML">🗺</button>':''}
       <button class="btn-icon" onclick="printInstReport('${esc(i.fak)}')" title="Εκτύπωση αναφοράς">🖨️</button>
@@ -3661,6 +3719,10 @@ function acModalFak(inp,inpId,listId){
   const q=inp.value.toLowerCase();
   const list=document.getElementById(listId);
   if(!list)return;
+  // Keep qnav in sync as user types — only enable when FAK matches an installation
+  const exactMatch=installations.find(i=>i.fak===inp.value.trim());
+  const modalKey=inpId==='cf-fak'?'cert':(inpId==='ef-fak'?'equip':(inpId==='if-fak'?'inst':null));
+  if(modalKey) qnavShow(modalKey, exactMatch?exactMatch.fak:null);
   const sorted=[...installations].sort((a,b)=>a.fak.localeCompare(b.fak));
   const matches=q?sorted.filter(i=>(i.fak+' '+i.name).toLowerCase().includes(q)):sorted;
   if(!matches.length){list.classList.remove('show');return;}
@@ -3680,6 +3742,11 @@ function selectModalFak(fak,name,inpId,listId){
   if(inpId==='ef-fak'){
     const hidden=document.getElementById('ef-fak-edit');
     if(hidden) hidden.value=fak;
+    qnavShow('equip',fak);
+  } else if(inpId==='cf-fak'){
+    qnavShow('cert',fak);
+  } else if(inpId==='if-fak'){
+    qnavShow('inst',fak);
   }
 }
 
@@ -3689,12 +3756,17 @@ let qnavFak=null; // Τρέχων ΦΑΚ για quick nav
 function qnavShow(modalId, fak){
   qnavFak=fak||null;
   const bar=document.getElementById('qnav-'+modalId);
-  if(bar) bar.style.display=fak?'flex':'none';
-  // Εμφάνισε ΦΑΚ στο bar
-  if(bar&&fak){
-    const span=bar.querySelector('span');
-    if(span) span.textContent='Φάκελος: '+fak;
+  if(!bar) return;
+  // Always visible — dim & lock buttons when no FAK yet
+  bar.style.display='flex';
+  if(fak){
+    bar.classList.remove('nofak');
+  } else {
+    bar.classList.add('nofak');
   }
+  // Update label
+  const span=bar.querySelector('span');
+  if(span) span.textContent=fak?('Φάκελος: '+fak):'Φάκελος: (επιλέξτε ΦΑΚ για navigation)';
 }
 
 function qnavGo(target){
