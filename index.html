@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.08
+  Έκδοση: v5.10
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.08</title>
+<title>Μητρώο Εγκαταστάσεων v5.10</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -184,11 +184,23 @@ table{width:100%;border-collapse:collapse}
 .stat-lbl{font-size:10px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:0.3px;font-weight:500}
 
 /* ── TOASTS ── */
-#toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{padding:10px 16px;border-radius:8px;font-size:13px;color:#fff;background:#1a1f2e;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:toastIn .2s ease;max-width:320px}
-.toast.error{background:#dc2626}
-.toast.success{background:#15803d}
-@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+#toast{
+  position:fixed;bottom:24px;right:24px;z-index:2000;
+  padding:11px 18px 11px 14px;border-radius:9px;
+  font-size:13px;font-weight:500;color:#fff;
+  background:#1a1f2e;
+  box-shadow:0 6px 24px rgba(0,0,0,.22),0 1px 4px rgba(0,0,0,.12);
+  max-width:360px;line-height:1.4;
+  display:none;
+  border-left:4px solid rgba(255,255,255,.25);
+  animation:toastIn .22s ease forwards;
+}
+#toast.show{display:block}
+#toast.success{background:#15803d;border-left-color:#86efac}
+#toast.error{background:#dc2626;border-left-color:#fca5a5}
+#toast.warning{background:#d97706;border-left-color:#fde68a}
+#toast.info{background:#1a3a6b;border-left-color:#93c5fd}
+@keyframes toastIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
 
 /* ── CARDS ── */
 .card{background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden}
@@ -788,7 +800,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.08</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.10</p>
   </div>
 </div>
 
@@ -796,7 +808,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.08</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.10</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -2308,15 +2320,46 @@ const PROTO_CANON_MAP=[
     variants:[
       'αδ λειτ',
       'αδ λειτουργιας',
-      'αδ λειτουργιας',
       'αδεια λειτουργιας',
       'αδεια λετουργιας',   // typo missing 'ι'
       'α λειτουργιας',
     ]
+  },
+  {
+    canonical:'ΑΛΛ ΔΙΚΑΙΟΥΧΟΥ',
+    variants:[
+      'αλλ δικ',
+      'αλλ δικαιουχ',
+      'αλλ δικαιουχου',
+      'αλλαγη δικαιουχου',
+    ]
+  },
+  {
+    canonical:'ΕΓΓΡΑΦΟ',
+    // Όλες οι παραλλαγές με προέκταση (ΕΛΛΙΠΗ, ΣΕ ΑΑΔΕ κλπ) ενοποιούνται
+    // σε σκέτο "ΕΓΓΡΑΦΟ". Αν θες να διατηρηθεί η προέκταση ως πληροφορία,
+    // αφαίρεσε το αντίστοιχο variant παρακάτω (θα το χάσει η ενοποίηση).
+    variants:[
+      'εγγραφο',
+      'εγγραφα',
+      'εγγρφαο',                            // typo (α↔φ swap)
+      'εγγρφαο σε ατ',                      // typo + ΑΤ destination
+      'εγγραφο ελλιπη',
+      'εγγραφο σε ααδε',
+      'εγγραφο σε νομικη',
+      'εγγραφο σε υδομ',
+      'εγγραφο στο υμε',
+      'εγγραφο στην αποκεντρωμενη',
+      'εγγραφο για ελεγχ πληρ',
+      'εγγραφο για ελλιπη',
+      'εγγραφο για κωδικο',
+      'εγγραφο με κεα',
+      'εγγραφο προς υπηρεσιες',
+      'εγγραφο προς υπδ',
+    ]
   }
   // Επόμενες ομάδες προστίθενται εδώ:
   // { canonical:'ΑΔ ΙΔΡΥΣΗΣ', variants:['αδ ιδρ','αδεια ιδρυσης',...] },
-  // { canonical:'ΑΛΛ ΔΙΚΑΙΟΥΧΟΥ', variants:['αλλ δικ','αλλαγη δικαιουχου',...] },
 ];
 
 // Normalize Greek text για robust comparison:
@@ -2634,7 +2677,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.08',
+    version:'v5.10',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -2683,7 +2726,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.08',
+    version:'v5.10',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -2872,13 +2915,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.08',
+      version:'v5.10',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.08',
+      version:'v5.10',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -3693,8 +3736,9 @@ function saveInst(){
   save('inst',installations);
   updateBadges();
   renderInst();
-  closeModal('modal-inst');
-  toast(editInstId?'Εγκατάσταση ενημερώθηκε':'Εγκατάσταση αποθηκεύτηκε','success');
+  flashSaveThenClose('modal-inst', function(){
+    toast(editInstId?'✓ Εγκατάσταση ενημερώθηκε':'✓ Εγκατάσταση αποθηκεύτηκε','success');
+  });
 }
 function deleteInst(fak){
   if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
@@ -4172,8 +4216,9 @@ function saveProto(){
   if(obj.energeia&&!aitimata_list.includes(obj.energeia)){aitimata_list.push(obj.energeia);aitimata_list.sort();}
   if(obj.mixanikos&&!engineers_dynamic.includes(obj.mixanikos)){engineers_dynamic.push(obj.mixanikos);engineers_dynamic.sort();}
   updateBadges();renderProto();renderDash();populateYearFilter();
-  closeModal('modal-proto');
-  toast(editProtoId?'Κίνηση ενημερώθηκε':'Κίνηση αποθηκεύτηκε','success');
+  flashSaveThenClose('modal-proto', function(){
+    toast(editProtoId?'✓ Κίνηση ενημερώθηκε':'✓ Κίνηση αποθηκεύτηκε','success');
+  });
 }
 function deleteProto(id){
   protocol=protocol.filter(p=>p._id!==id);
@@ -4479,10 +4524,14 @@ function saveCerts(){
   });
   save('certs',certificates);
   updateBadges();renderCerts();
-  closeModal('modal-cert');
   document.getElementById('cf-fak').disabled=false;
-  if(errors>0) toast(`Αποθηκεύτηκαν ${saved} πιστοποιητικά (${errors} παραλείφθηκαν χωρίς τύπο)`,'warning');
-  else toast(`✓ Αποθηκεύτηκαν ${saved} πιστοποιητικά για ΦΑΚ ${fak}`,'success');
+  const toastMsg=errors>0
+    ?`⚠️ Αποθηκεύτηκαν ${saved} πιστοποιητικά (${errors} παραλείφθηκαν χωρίς τύπο)`
+    :`✓ Αποθηκεύτηκαν ${saved} πιστοποιητικά για ΦΑΚ ${fak}`;
+  const toastType=errors>0?'warning':'success';
+  flashSaveThenClose('modal-cert', function(){
+    toast(toastMsg, toastType);
+  });
 }
 
 // Keep saveCert as alias for single-edit compatibility
@@ -4924,8 +4973,9 @@ function saveEquip(){
   else equipment.push(obj);
   save('equip',equipment);
   updateBadges();renderEquip();
-  closeModal('modal-equip');
-  toast('Εξοπλισμός αποθηκεύτηκε','success');
+  flashSaveThenClose('modal-equip', function(){
+    toast('✓ Εξοπλισμός αποθηκεύτηκε','success');
+  });
 }
 function deleteEquip(fak){
   if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
@@ -5111,6 +5161,33 @@ function uid(){return 'id_'+Date.now()+'_'+Math.random().toString(36).substr(2,6
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function fmtDate(d){if(!d)return '';try{const[y,m,dy]=d.split('-');return `${dy}/${m}/${y}`;}catch(e){return d;}}
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
+
+// ── SAVE FEEDBACK HELPER (v5.10) ──────────────────────────────────
+// Κάνει το κουμπί Αποθήκευσης πράσινο "✓ Αποθηκεύτηκε!" για 400ms,
+// μετά κλείνει το modal και καλεί το callback (π.χ. toast notification).
+// Έτσι ο χρήστης βλέπει σαφές confirmation ΜΕΣΑ στο modal πριν κλείσει.
+function flashSaveThenClose(modalId, cb){
+  const footer=document.querySelector('#'+modalId+' .modal-footer');
+  const btn=footer?footer.querySelector('.btn-primary'):null;
+  if(btn){
+    const origHtml=btn.innerHTML;
+    const origStyle=btn.getAttribute('style')||'';
+    btn.innerHTML='✓ Αποθηκεύτηκε!';
+    btn.disabled=true;
+    btn.style.cssText='background:#15803d;border-color:#15803d;color:#fff;transform:none';
+    setTimeout(function(){
+      closeModal(modalId);
+      btn.innerHTML=origHtml;
+      btn.disabled=false;
+      btn.setAttribute('style',origStyle);
+      if(cb) cb();
+    }, 420);
+  } else {
+    closeModal(modalId);
+    if(cb) cb();
+  }
+}
+// ──────────────────────────────────────────────────────────────────
 
 function toast(msg,type='success'){
   const el=document.getElementById('toast');
@@ -5357,7 +5434,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.08</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.10</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
