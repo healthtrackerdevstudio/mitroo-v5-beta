@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.12
+  Έκδοση: v5.13
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.12</title>
+<title>Μητρώο Εγκαταστάσεων v5.13</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -356,8 +356,7 @@ table{width:100%;border-collapse:collapse}
   z-index:60;
   display:none;
 }
-.ac-list.show,
-.ac-list:not(:empty){display:block}
+.ac-list.show{display:block}
 .ac-list > div,
 .ac-list > a,
 .ac-list .ac-item{
@@ -799,7 +798,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.12</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.13</p>
   </div>
 </div>
 
@@ -807,7 +806,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.12</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.13</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -1514,7 +1513,7 @@ const MiniDocGen = {
           <input class="form-control" id="if-fak" placeholder="π.χ. GPL 35_10">
         </div>
         <div class="form-group">
-          <label>Τμήμα / Φύλλο</label>
+          <label>Τμήμα / Φύλλο <span style="color:#dc2626">*</span></label>
           <select class="form-control" id="if-sheet" onchange="onInstTypeChange()">
             <option value="">—</option>
             <option value="inst">Εγκαταστάσεις</option>
@@ -1522,11 +1521,11 @@ const MiniDocGen = {
           </select>
         </div>
         <div class="form-group ff">
-          <label>Επωνυμία</label>
+          <label>Επωνυμία <span style="color:#dc2626">*</span></label>
           <input class="form-control" id="if-name" placeholder="Επωνυμία εγκατάστασης">
         </div>
         <div class="form-group">
-          <label>ΑΦΜ</label>
+          <label>ΑΦΜ <span style="color:#dc2626">*</span> <span style="font-size:10px;color:#94a3b8;font-weight:400">(ακριβώς 9 ψηφία)</span></label>
           <input class="form-control" id="if-afm" placeholder="123456789">
         </div>
         <div class="form-group">
@@ -1534,12 +1533,13 @@ const MiniDocGen = {
           <input class="form-control" id="if-adeia" placeholder="Αρ. άδειας">
         </div>
         <div class="form-group ff">
-          <label>Διεύθυνση</label>
+          <label>Διεύθυνση <span style="color:#dc2626">*</span></label>
           <input class="form-control" id="if-address" placeholder="Οδός, αρ.">
         </div>
         <div class="form-group">
-          <label>Περιοχή / Τοποθεσία</label>
-          <input class="form-control" id="if-topothesia" placeholder="π.χ. ΒΑΡΗ">
+          <label>Περιοχή / Τοποθεσία <span style="color:#dc2626">*</span></label>
+          <input class="form-control" id="if-topothesia" placeholder="π.χ. ΒΑΡΗ" list="topo-datalist" autocomplete="off">
+          <datalist id="topo-datalist"></datalist>
         </div>
         <div class="form-group">
           <label>Τηλέφωνο</label>
@@ -2684,7 +2684,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.12',
+    version:'v5.13',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -2733,7 +2733,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.12',
+    version:'v5.13',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -2922,13 +2922,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.12',
+      version:'v5.13',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.12',
+      version:'v5.13',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -3539,6 +3539,12 @@ function typeTag(t,sub){
 function openInstModal(fak=null){
   if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
   closeAllAcLists();
+  // Populate Περιοχή datalist from existing installation topothesia values
+  const tdl=document.getElementById('topo-datalist');
+  if(tdl){
+    const topos=[...new Set(installations.map(function(i){return i.topothesia;}).filter(Boolean))].sort();
+    tdl.innerHTML=topos.map(function(t){return '<option value="'+t.replace(/"/g,'&quot;')+'">';}).join('');
+  }
   editInstId=fak;
   const i=fak?installations.find(x=>x.fak===fak):null;
   document.getElementById('modal-inst-title').textContent=fak?'Επεξεργασία Εγκατάστασης':'Νέα Εγκατάσταση';
@@ -3689,7 +3695,22 @@ function normalizeFak(f){
 
 function saveInst(){
   const fak=document.getElementById('if-fak').value.trim();
-  if(!fak){toast('Το ΦΑΚ είναι υποχρεωτικό','error');return;}
+  if(!fak){toast('⚠️ Το ΦΑΚ είναι υποχρεωτικό','error');return;}
+
+  // ── Υποχρεωτικά πεδία ────────────────────────────────────────
+  const reqName=document.getElementById('if-name').value.trim();
+  if(!reqName){toast('⚠️ Η Επωνυμία είναι υποχρεωτική','error');document.getElementById('if-name').focus();return;}
+  const reqSheet=document.getElementById('if-sheet').value.trim();
+  if(!reqSheet){toast('⚠️ Το Τμήμα / Φύλλο είναι υποχρεωτικό','error');document.getElementById('if-sheet').focus();return;}
+  const reqAddress=document.getElementById('if-address').value.trim();
+  if(!reqAddress){toast('⚠️ Η Διεύθυνση είναι υποχρεωτική','error');document.getElementById('if-address').focus();return;}
+  const reqTopo=document.getElementById('if-topothesia').value.trim();
+  if(!reqTopo){toast('⚠️ Η Περιοχή είναι υποχρεωτική','error');document.getElementById('if-topothesia').focus();return;}
+  const reqAfm=document.getElementById('if-afm').value.trim();
+  if(!reqAfm){toast('⚠️ Το ΑΦΜ είναι υποχρεωτικό (9 ψηφία)','error');document.getElementById('if-afm').focus();return;}
+  if(!/^\d{9}$/.test(reqAfm)){toast('⚠️ ΑΦΜ: ακριβώς 9 αριθμητικά ψηφία (χωρίς γράμματα ή κενά)','error');document.getElementById('if-afm').focus();return;}
+  // ─────────────────────────────────────────────────────────────
+
   // Duplicate check — μόνο για νέες εγγραφές
   if(!editInstId){
     const fakNorm=normalizeFak(fak);
@@ -5038,7 +5059,7 @@ function closeAllAcLists(){
 }
 function confirmDelete(msg,fn){
   document.getElementById('confirm-msg').textContent=msg;
-  document.getElementById('confirm-ok').onclick=()=>{fn();closeModal('modal-confirm');};
+  document.getElementById('confirm-ok').onclick=function(){ closeModal('modal-confirm'); fn(); };
   openModal('modal-confirm');
 }
 // Close modal on overlay click
@@ -5197,7 +5218,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function fmtDate(d){if(!d)return '';try{const[y,m,dy]=d.split('-');return `${dy}/${m}/${y}`;}catch(e){return d;}}
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
 
-// ── SAVE FEEDBACK HELPER (v5.12) ──────────────────────────────────
+// ── SAVE FEEDBACK HELPER (v5.13) ──────────────────────────────────
 // Κάνει το κουμπί Αποθήκευσης πράσινο "✓ Αποθηκεύτηκε!" για 400ms,
 // μετά κλείνει το modal και καλεί το callback (π.χ. toast notification).
 // Έτσι ο χρήστης βλέπει σαφές confirmation ΜΕΣΑ στο modal πριν κλείσει.
@@ -5483,7 +5504,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.12</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.13</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
