@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.13
+  Έκδοση: v5.14
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.13</title>
+<title>Μητρώο Εγκαταστάσεων v5.14</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -798,7 +798,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.13</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.14</p>
   </div>
 </div>
 
@@ -806,7 +806,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.13</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.14</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -2684,7 +2684,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.13',
+    version:'v5.14',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -2733,7 +2733,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.13',
+    version:'v5.14',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -2922,13 +2922,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.13',
+      version:'v5.14',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.13',
+      version:'v5.14',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -3700,15 +3700,20 @@ function saveInst(){
   // ── Υποχρεωτικά πεδία ────────────────────────────────────────
   const reqName=document.getElementById('if-name').value.trim();
   if(!reqName){toast('⚠️ Η Επωνυμία είναι υποχρεωτική','error');document.getElementById('if-name').focus();return;}
-  const reqSheet=document.getElementById('if-sheet').value.trim();
-  if(!reqSheet){toast('⚠️ Το Τμήμα / Φύλλο είναι υποχρεωτικό','error');document.getElementById('if-sheet').focus();return;}
-  const reqAddress=document.getElementById('if-address').value.trim();
-  if(!reqAddress){toast('⚠️ Η Διεύθυνση είναι υποχρεωτική','error');document.getElementById('if-address').focus();return;}
-  const reqTopo=document.getElementById('if-topothesia').value.trim();
-  if(!reqTopo){toast('⚠️ Η Περιοχή είναι υποχρεωτική','error');document.getElementById('if-topothesia').focus();return;}
+  if(!editInstId){
+    // Νέα εγκατάσταση — πλήρης έλεγχος υποχρεωτικών
+    const reqSheet=document.getElementById('if-sheet').value.trim();
+    if(!reqSheet){toast('⚠️ Το Τμήμα / Φύλλο είναι υποχρεωτικό','error');return;}
+    const reqAddress=document.getElementById('if-address').value.trim();
+    if(!reqAddress){toast('⚠️ Η Διεύθυνση είναι υποχρεωτική','error');document.getElementById('if-address').focus();return;}
+    const reqTopo=document.getElementById('if-topothesia').value.trim();
+    if(!reqTopo){toast('⚠️ Η Περιοχή είναι υποχρεωτική','error');document.getElementById('if-topothesia').focus();return;}
+    const reqAfm0=document.getElementById('if-afm').value.trim();
+    if(!reqAfm0){toast('⚠️ Το ΑΦΜ είναι υποχρεωτικό (9 ψηφία)','error');document.getElementById('if-afm').focus();return;}
+  }
+  // ΑΦΜ format — πάντα αν έχει συμπληρωθεί
   const reqAfm=document.getElementById('if-afm').value.trim();
-  if(!reqAfm){toast('⚠️ Το ΑΦΜ είναι υποχρεωτικό (9 ψηφία)','error');document.getElementById('if-afm').focus();return;}
-  if(!/^\d{9}$/.test(reqAfm)){toast('⚠️ ΑΦΜ: ακριβώς 9 αριθμητικά ψηφία (χωρίς γράμματα ή κενά)','error');document.getElementById('if-afm').focus();return;}
+  if(reqAfm&&!/^\d{9}$/.test(reqAfm)){toast('⚠️ ΑΦΜ: ακριβώς 9 αριθμητικά ψηφία','error');document.getElementById('if-afm').focus();return;}
   // ─────────────────────────────────────────────────────────────
 
   // Duplicate check — μόνο για νέες εγγραφές
@@ -3778,30 +3783,24 @@ function saveInst(){
     installations.push(obj);
   }
   save('inst',installations);
-  updateBadges();
-  renderInst();
   flashSaveThenClose('modal-inst', function(){
     toast(editInstId?'✓ Εγκατάσταση ενημερώθηκε':'✓ Εγκατάσταση αποθηκεύτηκε','success');
+    try{ updateBadges(); renderInst(); }catch(e){ console.warn('renderInst error:',e); }
   });
 }
 function deleteInst(fak){
   if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
-  // Μέτρα συσχετισμένων εγγραφών
   var relCerts=certificates.filter(function(c){return c.fak===fak;}).length;
   var relEquip=equipment.filter(function(e){return e.fak===fak;}).length;
-  var msg='Διαγραφή εγκατάστασης '+fak+';';
-  if(relCerts>0||relEquip>0){
-    msg+='\n\nΘα διαγραφούν επίσης:';
-    if(relCerts>0) msg+='\n• '+relCerts+' πιστοποιητικά';
-    if(relEquip>0) msg+='\n• '+relEquip+' εγγραφές εξοπλισμού';
-  }
-  if(!confirm(msg)) return;
   installations=installations.filter(function(i){return i.fak!==fak;});
   if(relCerts>0){ certificates=certificates.filter(function(c){return c.fak!==fak;}); save('certs',certificates); }
   if(relEquip>0){ equipment=equipment.filter(function(e){return e.fak!==fak;}); save('equip',equipment); }
   save('inst',installations);
-  updateBadges();renderInst();renderDash();renderCerts();renderEquip();
-  toast('Εγκατάσταση + '+relCerts+' πιστ. + '+relEquip+' εξοπλ. διαγράφηκαν');
+  try{ updateBadges();renderInst();renderDash();if(relCerts>0)renderCerts();if(relEquip>0)renderEquip(); }catch(e){}
+  var extra=[];
+  if(relCerts>0) extra.push(relCerts+' πιστ/κά');
+  if(relEquip>0) extra.push(relEquip+' εξοπλ.');
+  toast('🗑 Εγκατάσταση «'+fak+'» διαγράφηκε'+(extra.length?' (+ '+extra.join(', ')+')':''),'info');
 }
 
 // ══ PROTOCOL ══
@@ -4265,16 +4264,16 @@ function saveProto(){
   if(obj.aitima&&!aitimata_list.includes(obj.aitima)){aitimata_list.push(obj.aitima);aitimata_list.sort();}
   if(obj.energeia&&!aitimata_list.includes(obj.energeia)){aitimata_list.push(obj.energeia);aitimata_list.sort();}
   if(obj.mixanikos&&!engineers_dynamic.includes(obj.mixanikos)){engineers_dynamic.push(obj.mixanikos);engineers_dynamic.sort();}
-  updateBadges();renderProto();renderDash();populateYearFilter();
   flashSaveThenClose('modal-proto', function(){
     toast(editProtoId?'✓ Κίνηση ενημερώθηκε':'✓ Κίνηση αποθηκεύτηκε','success');
+    try{ updateBadges();renderProto();renderDash();populateYearFilter(); }catch(e){ console.warn('renderProto error:',e); }
   });
 }
 function deleteProto(id){
   protocol=protocol.filter(p=>p._id!==id);
   save('proto',protocol);
-  updateBadges();renderProto();renderDash();
-  toast('Κίνηση διαγράφηκε');
+  try{ updateBadges();renderProto();renderDash(); }catch(e){}
+  toast('🗑 Κίνηση διαγράφηκε','info');
 }
 
 // ══ CERTIFICATES ══
@@ -4574,7 +4573,6 @@ function saveCerts(){
     } else {obj._id=uid();certificates.push(obj);saved++;}
   });
   save('certs',certificates);
-  updateBadges();renderCerts();
   document.getElementById('cf-fak').disabled=false;
   const toastMsg=errors>0
     ?`⚠️ Αποθηκεύτηκαν ${saved} πιστοποιητικά (${errors} παραλείφθηκαν χωρίς τύπο)`
@@ -4582,6 +4580,7 @@ function saveCerts(){
   const toastType=errors>0?'warning':'success';
   flashSaveThenClose('modal-cert', function(){
     toast(toastMsg, toastType);
+    try{ updateBadges(); renderCerts(); }catch(e){ console.warn('renderCerts error:',e); }
   });
 }
 
@@ -4594,8 +4593,8 @@ function deleteCert(id){
   if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
   certificates=certificates.filter(c=>c._id!==id);
   save('certs',certificates);
-  updateBadges();renderCerts();
-  toast('Πιστοποιητικό διαγράφηκε');
+  try{ updateBadges();renderCerts(); }catch(e){}
+  toast('🗑 Πιστοποιητικό διαγράφηκε','info');
 }
 // ══ EQUIPMENT ══
 function addPumpRow(type='',eidos='',products='',epistomia=''){
@@ -5024,17 +5023,17 @@ function saveEquip(){
   if(idx>=0)equipment[idx]=obj;
   else equipment.push(obj);
   save('equip',equipment);
-  updateBadges();renderEquip();
   flashSaveThenClose('modal-equip', function(){
     toast('✓ Εξοπλισμός αποθηκεύτηκε','success');
+    try{ updateBadges(); renderEquip(); }catch(e){ console.warn('renderEquip error:',e); }
   });
 }
 function deleteEquip(fak){
   if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
   equipment=equipment.filter(e=>e.fak!==fak);
   save('equip',equipment);
-  updateBadges();renderEquip();
-  toast('Εγγραφή διαγράφηκε');
+  try{ updateBadges();renderEquip(); }catch(e){}
+  toast('🗑 Εξοπλισμός «'+fak+'» διαγράφηκε','info');
 }
 
 // ══ SORT ══
@@ -5218,7 +5217,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function fmtDate(d){if(!d)return '';try{const[y,m,dy]=d.split('-');return `${dy}/${m}/${y}`;}catch(e){return d;}}
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
 
-// ── SAVE FEEDBACK HELPER (v5.13) ──────────────────────────────────
+// ── SAVE FEEDBACK HELPER (v5.14) ──────────────────────────────────
 // Κάνει το κουμπί Αποθήκευσης πράσινο "✓ Αποθηκεύτηκε!" για 400ms,
 // μετά κλείνει το modal και καλεί το callback (π.χ. toast notification).
 // Έτσι ο χρήστης βλέπει σαφές confirmation ΜΕΣΑ στο modal πριν κλείσει.
@@ -5504,7 +5503,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.13</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.14</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
