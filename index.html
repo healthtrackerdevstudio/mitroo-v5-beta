@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.14
+  Έκδοση: v5.15
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.14</title>
+<title>Μητρώο Εγκαταστάσεων v5.15</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -798,7 +798,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.14</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.15</p>
   </div>
 </div>
 
@@ -806,7 +806,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.14</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.15</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -2684,7 +2684,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.14',
+    version:'v5.15',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -2733,7 +2733,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.14',
+    version:'v5.15',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -2922,13 +2922,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.14',
+      version:'v5.15',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.14',
+      version:'v5.15',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -3928,7 +3928,7 @@ function renderProto(){
                  p.hm_exerx?`<span class="badge badge-blue">🔵 Προς Υπογραφές</span>`:
                  p.hm_xreosis?`<span class="badge badge-gray">⬜ Προς Ενέργεια</span>`:
                  `<span class="badge badge-gray">Νέο</span>`;
-    return `<tr class="${rowCls} clickable">
+    return `<tr class="${rowCls} clickable" onclick="openProtoModal('${p._id||''}')" title="Κλικ για επεξεργασία">
       <td class="mono"><strong>${esc(p.fak)}</strong></td>
       <td class="mono muted">${esc(p.proto_eisx)}</td>
       <td class="mono">${fmtDate(p.hm_xreosis)}</td>
@@ -3939,7 +3939,7 @@ function renderProto(){
       <td class="mono muted">${p.proto_exerx?`<a href="${p.proto_exerx_link||'#'}" target="${p.proto_exerx_link?'_blank':'_self'}" style="color:var(--accent);text-decoration:none">${esc(p.proto_exerx)}</a>`:''}</td>
       <td style="font-size:12px;color:var(--text2)">${esc(p.energeia||'')}</td>
       <td>${teliko}</td>
-      <td class="actions">
+      <td class="actions" onclick="event.stopPropagation()">
         <button class="btn-icon" onclick="openProtoModal('${p._id||''}')" title="Επεξεργασία">✏️</button>
         <button class="btn-icon" onclick="confirmDelete('Διαγραφή κίνησης;',()=>deleteProto('${p._id||''}'))" title="Διαγραφή">🗑</button>
       </td>
@@ -4389,7 +4389,10 @@ function openCertsFakModal(fak){
     if(eb){closeCertsFakModal();openCertModal(eb.dataset.editcert);return;}
     const db=e.target.closest('[data-delcert]');
     if(db){
-      deleteCert(db.dataset.delcert); closeCertsFakModal();
+      confirmDelete('Διαγραφή πιστοποιητικού;',function(){
+        deleteCert(db.dataset.delcert);
+        closeCertsFakModal();
+      });
       return;
     }
     const ab=e.target.closest('[data-addcertfak2]');
@@ -4488,7 +4491,7 @@ function addCertRow(data={}){
        <input class="form-control cert-row-link" placeholder="URL ή διαδρομή αρχείου" style="font-size:12px;flex:1" value="${data.doc_link||''}">
        <label class="btn btn-secondary btn-sm" style="cursor:pointer;white-space:nowrap;padding:4px 6px;font-size:11px" title="Επιλογή αρχείου">📂<input type="file" style="display:none" onchange="setCertRowLink(this)"></label>
      </div>`+
-    `<button type="button" class="btn-icon" onclick="this.closest('.cert-row').remove()" title="Αφαίρεση" style="color:var(--danger)">✕</button>`;
+    `<button type="button" class="btn-icon" onclick="removeCertRow(this)" title="Διαγραφή πιστοποιητικού" style="color:var(--danger)">🗑</button>`;
   // Store existing _id if editing
   if(data._id) row.dataset.id=data._id;
   document.getElementById('cf-cert-rows').appendChild(row);
@@ -4595,6 +4598,22 @@ function deleteCert(id){
   save('certs',certificates);
   try{ updateBadges();renderCerts(); }catch(e){}
   toast('🗑 Πιστοποιητικό διαγράφηκε','info');
+}
+
+// Αφαίρεση γραμμής πιστοποιητικού από τη φόρμα modal-cert.
+// Αν η γραμμή έχει αποθηκευμένο _id → επιβεβαίωση πριν αφαίρεση.
+// Η οριστική αποθήκευση γίνεται με κλικ στο κουμπί Αποθήκευση.
+function removeCertRow(btn){
+  const row=btn.closest('.cert-row');
+  if(!row) return;
+  if(row.dataset.id){
+    confirmDelete('Αφαίρεση πιστοποιητικού;\n(Η διαγραφή οριστικοποιείται με Αποθήκευση)',function(){
+      row.remove();
+      toast('Γραμμή αφαιρέθηκε — πατήστε Αποθήκευση για να επιβεβαιωθεί','warning');
+    });
+  } else {
+    row.remove(); // νέα γραμμή, χωρίς επιβεβαίωση
+  }
 }
 // ══ EQUIPMENT ══
 function addPumpRow(type='',eidos='',products='',epistomia=''){
@@ -5050,8 +5069,18 @@ function sortTbl(tbl,col){
 }
 
 // ══ MODAL helpers ══
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openModal(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.classList.add('open');
+  el.style.display='flex';
+}
+function closeModal(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('open');
+  el.style.display='none';
+}
 // Κλείνει ΟΛΕΣ τις ac-list dropdowns — καλείται πάντα πριν ανοίξει modal
 function closeAllAcLists(){
   document.querySelectorAll('.ac-list').forEach(function(l){l.classList.remove('show');});
@@ -5217,7 +5246,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function fmtDate(d){if(!d)return '';try{const[y,m,dy]=d.split('-');return `${dy}/${m}/${y}`;}catch(e){return d;}}
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
 
-// ── SAVE FEEDBACK HELPER (v5.14) ──────────────────────────────────
+// ── SAVE FEEDBACK HELPER (v5.15) ──────────────────────────────────
 // Κάνει το κουμπί Αποθήκευσης πράσινο "✓ Αποθηκεύτηκε!" για 400ms,
 // μετά κλείνει το modal και καλεί το callback (π.χ. toast notification).
 // Έτσι ο χρήστης βλέπει σαφές confirmation ΜΕΣΑ στο modal πριν κλείσει.
@@ -5503,7 +5532,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.14</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.15</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
