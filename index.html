@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.15
+  Έκδοση: v5.16
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.15</title>
+<title>Μητρώο Εγκαταστάσεων v5.16</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -185,7 +185,7 @@ table{width:100%;border-collapse:collapse}
 
 /* ── TOASTS ── */
 #toast{
-  position:fixed;bottom:24px;right:24px;z-index:2000;
+  position:fixed;bottom:24px;right:24px;z-index:9999;
   padding:11px 18px 11px 14px;border-radius:9px;
   font-size:13px;font-weight:500;color:#fff;
   background:#1a1f2e;
@@ -194,7 +194,7 @@ table{width:100%;border-collapse:collapse}
   display:none;
   border-left:4px solid rgba(255,255,255,.25);
 }
-#toast.show{display:block;animation:toastIn .22s ease forwards}
+#toast.show{display:block !important;animation:toastIn .22s ease forwards}
 #toast.success{background:#15803d;border-left-color:#86efac}
 #toast.error{background:#dc2626;border-left-color:#fca5a5}
 #toast.warning{background:#d97706;border-left-color:#fde68a}
@@ -798,7 +798,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.15</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.16</p>
   </div>
 </div>
 
@@ -806,7 +806,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.15</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.16</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -2293,6 +2293,7 @@ let nomosSortState={col:'year',dir:-1};
 
 const CERT_TYPES=[
   'Πιστ. Πυροπροστασίας','Ογκομετρικός Πίνακας','ΥΔΕ',
+  'Πιστ. Αεροσυμπιεστή','Πιστ. Αεροσυμπιεστή LPG',
   'Πιστ. Αεροφυλακίου','Πιστ. Αεροφυλακίου LPG','Ετήσια Ανταποδοτικά Τέλη',
   'Πιστ. Δεξαμενών Υγρών','Πιστ. Δεξαμενής LPG',
   'Πιστ. Υδραυλικής Δοκιμασίας Υγρών','Πιστ. Υδραυλικής Δοκιμασίας LPG',
@@ -2684,7 +2685,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.15',
+    version:'v5.16',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -2733,7 +2734,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.15',
+    version:'v5.16',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -2922,13 +2923,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.15',
+      version:'v5.16',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.15',
+      version:'v5.16',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -3783,10 +3784,9 @@ function saveInst(){
     installations.push(obj);
   }
   save('inst',installations);
-  flashSaveThenClose('modal-inst', function(){
-    toast(editInstId?'✓ Εγκατάσταση ενημερώθηκε':'✓ Εγκατάσταση αποθηκεύτηκε','success');
-    try{ updateBadges(); renderInst(); }catch(e){ console.warn('renderInst error:',e); }
-  });
+  closeModal('modal-inst');
+  toast(editInstId?'✓ Εγκατάσταση ενημερώθηκε':'✓ Εγκατάσταση αποθηκεύτηκε','success');
+  try{ updateBadges(); renderInst(); }catch(e){ console.warn('renderInst:',e); }
 }
 function deleteInst(fak){
   if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
@@ -4173,6 +4173,92 @@ function checkFakAlerts(fak){
     }
   }
 
+  // 4. Υποχρεωτικά πιστοποιητικά για ΟΛΑ τα πρατήρια (εκτός Λοιπές Εγκαταστάσεις)
+  const isPratIrio = inst && inst.type && !inst.type.includes('Λοιπές');
+  if(isPratIrio){
+    // Ελέγχει αν υπάρχει ΕΓΚΥΡΟ (μη ληγμένο) πιστοποιητικό
+    function hasValidCert(needle){
+      return validCerts.some(function(c){return (c.type||'').toLowerCase().includes(needle.toLowerCase());});
+    }
+    function hasValidCertExcl(needle, excl){
+      return validCerts.some(function(c){
+        const t=(c.type||'').toLowerCase();
+        return t.includes(needle.toLowerCase()) && !t.includes(excl.toLowerCase());
+      });
+    }
+
+    // Για ΟΛΕΣ τις εγκαταστάσεις — Πιστ. Πυροπροστασίας
+    if(!hasValidCert('πυροπροστ')){
+      alerts.push({type:'danger',icon:'🔥',
+        msg:fakCerts.some(c=>(c.type||'').toLowerCase().includes('πυροπροστ'))
+          ?'⚠️ Πιστ. Πυροπροστασίας έχει ΛΗΞΕΙ'
+          :'❌ Λείπει Πιστ. Πυροπροστασίας (υποχρεωτικό)'});
+    }
+    // ΥΔΕ
+    if(!hasValidCert('υδε')){
+      alerts.push({type:'danger',icon:'📋',
+        msg:fakCerts.some(c=>(c.type||'').toLowerCase().includes('υδε'))
+          ?'⚠️ ΥΔΕ έχει ΛΗΞΕΙ'
+          :'❌ Λείπει ΥΔΕ (υποχρεωτικό)'});
+    }
+    // Πιστ. Δεξαμενών Υγρών (όχι LPG/CNG)
+    if(!hasValidCertExcl('δεξαμεν','lpg')&&!hasValidCertExcl('δεξαμεν','cng')){
+      // Ελέγχει αν υπάρχει δεξαμενή υγρών
+      const hasLiquidTanks = !eq || (eq.tanks||[]).some(t=>{
+        const f=(t.fuel||'').toUpperCase();
+        return f!=='LPG'&&f!=='CNG'&&f!=='';
+      });
+      if(hasLiquidTanks){
+        alerts.push({type:'danger',icon:'⛽',
+          msg:fakCerts.some(c=>{const t=(c.type||'').toLowerCase();return t.includes('δεξαμεν')&&!t.includes('lpg')&&!t.includes('cng');})
+            ?'⚠️ Πιστ. Δεξαμενών Υγρών έχει ΛΗΞΕΙ'
+            :'❌ Λείπει Πιστ. Δεξαμενών Υγρών (υποχρεωτικό)'});
+      }
+    }
+    // Πιστ. Εξαεριστικών
+    if(!hasValidCert('εξαεριστ')){
+      alerts.push({type:'warning',icon:'💨',
+        msg:fakCerts.some(c=>(c.type||'').toLowerCase().includes('εξαεριστ'))
+          ?'⚠️ Πιστ. Εξαεριστικών έχει ΛΗΞΕΙ'
+          :'⚠️ Λείπει Πιστ. Εξαεριστικών'});
+    }
+    // Πιστ. Αεροσυμπιεστή (regular, not LPG)
+    if(!hasValidCertExcl('αεροσυμπιεστ','lpg')&&!hasValidCertExcl('αεροφυλακ','lpg')){
+      alerts.push({type:'warning',icon:'🔧',
+        msg:fakCerts.some(c=>{const t=(c.type||'').toLowerCase();return (t.includes('αεροσυμπιεστ')||t.includes('αεροφυλακ'))&&!t.includes('lpg');})
+          ?'⚠️ Πιστ. Αεροσυμπιεστή έχει ΛΗΞΕΙ'
+          :'⚠️ Λείπει Πιστ. Αεροσυμπιεστή'});
+    }
+
+    // Μικτό Πρατήριο — επιπλέον υποχρεωτικά
+    if(inst.type==='Μικτό Πρατήριο'){
+      const isLPG = inst.subtype==='GPL'||inst.subtype==='GPL+CNG';
+      const isCNG = inst.subtype==='CNG'||inst.subtype==='GPL+CNG';
+      if(isLPG){
+        // Πιστ. Αεροσυμπιεστή LPG
+        if(!hasValidCert('αεροσυμπιεστ lpg')&&!hasValidCert('αεροφυλακ lpg')&&
+           !validCerts.some(c=>{const t=(c.type||'').toLowerCase();return (t.includes('αεροσυμπιεστ')||t.includes('αεροφυλακ'))&&t.includes('lpg');})){
+          alerts.push({type:'danger',icon:'🟡',
+            msg:'❌ Λείπει Πιστ. Αεροσυμπιεστή LPG (υποχρεωτικό για Μικτό LPG)'});
+        }
+        // Πιστ. Δεξαμενής LPG
+        if(!validCerts.some(c=>{const t=(c.type||'').toLowerCase();return t.includes('δεξαμεν')&&t.includes('lpg');})){
+          alerts.push({type:'danger',icon:'🟡',
+            msg:fakCerts.some(c=>{const t=(c.type||'').toLowerCase();return t.includes('δεξαμεν')&&t.includes('lpg');})
+              ?'⚠️ Πιστ. Δεξαμενής LPG έχει ΛΗΞΕΙ'
+              :'❌ Λείπει Πιστ. Δεξαμενής LPG (υποχρεωτικό για Μικτό LPG)'});
+        }
+      }
+      if(isCNG){
+        // Πιστ. Δεξαμενής CNG
+        if(!validCerts.some(c=>{const t=(c.type||'').toLowerCase();return t.includes('δεξαμεν')&&t.includes('cng');})){
+          alerts.push({type:'danger',icon:'🟢',
+            msg:'❌ Λείπει Πιστ. Δεξαμενής CNG (υποχρεωτικό για Μικτό CNG)'});
+        }
+      }
+    }
+  }
+
   if(!alerts.length) return;
 
   // Εμφάνιση alerts μέσα στο modal
@@ -4264,10 +4350,9 @@ function saveProto(){
   if(obj.aitima&&!aitimata_list.includes(obj.aitima)){aitimata_list.push(obj.aitima);aitimata_list.sort();}
   if(obj.energeia&&!aitimata_list.includes(obj.energeia)){aitimata_list.push(obj.energeia);aitimata_list.sort();}
   if(obj.mixanikos&&!engineers_dynamic.includes(obj.mixanikos)){engineers_dynamic.push(obj.mixanikos);engineers_dynamic.sort();}
-  flashSaveThenClose('modal-proto', function(){
-    toast(editProtoId?'✓ Κίνηση ενημερώθηκε':'✓ Κίνηση αποθηκεύτηκε','success');
-    try{ updateBadges();renderProto();renderDash();populateYearFilter(); }catch(e){ console.warn('renderProto error:',e); }
-  });
+  closeModal('modal-proto');
+  toast(editProtoId?'✓ Κίνηση ενημερώθηκε':'✓ Κίνηση αποθηκεύτηκε','success');
+  try{ updateBadges();renderProto();renderDash();populateYearFilter(); }catch(e){ console.warn('renderProto:',e); }
 }
 function deleteProto(id){
   protocol=protocol.filter(p=>p._id!==id);
@@ -4581,10 +4666,9 @@ function saveCerts(){
     ?`⚠️ Αποθηκεύτηκαν ${saved} πιστοποιητικά (${errors} παραλείφθηκαν χωρίς τύπο)`
     :`✓ Αποθηκεύτηκαν ${saved} πιστοποιητικά για ΦΑΚ ${fak}`;
   const toastType=errors>0?'warning':'success';
-  flashSaveThenClose('modal-cert', function(){
-    toast(toastMsg, toastType);
-    try{ updateBadges(); renderCerts(); }catch(e){ console.warn('renderCerts error:',e); }
-  });
+  closeModal('modal-cert');
+  toast(toastMsg, toastType);
+  try{ updateBadges(); renderCerts(); }catch(e){ console.warn('renderCerts:',e); }
 }
 
 // Keep saveCert as alias for single-edit compatibility
@@ -5042,10 +5126,9 @@ function saveEquip(){
   if(idx>=0)equipment[idx]=obj;
   else equipment.push(obj);
   save('equip',equipment);
-  flashSaveThenClose('modal-equip', function(){
-    toast('✓ Εξοπλισμός αποθηκεύτηκε','success');
-    try{ updateBadges(); renderEquip(); }catch(e){ console.warn('renderEquip error:',e); }
-  });
+  closeModal('modal-equip');
+  toast('✓ Εξοπλισμός αποθηκεύτηκε','success');
+  try{ updateBadges(); renderEquip(); }catch(e){ console.warn('renderEquip:',e); }
 }
 function deleteEquip(fak){
   if(_serverRole==='guest'){toast('⛔ Δεν έχεις δικαίωμα','error');return;}
@@ -5246,42 +5329,13 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function fmtDate(d){if(!d)return '';try{const[y,m,dy]=d.split('-');return `${dy}/${m}/${y}`;}catch(e){return d;}}
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
 
-// ── SAVE FEEDBACK HELPER (v5.15) ──────────────────────────────────
-// Κάνει το κουμπί Αποθήκευσης πράσινο "✓ Αποθηκεύτηκε!" για 400ms,
-// μετά κλείνει το modal και καλεί το callback (π.χ. toast notification).
-// Έτσι ο χρήστης βλέπει σαφές confirmation ΜΕΣΑ στο modal πριν κλείσει.
+// ── SAVE FEEDBACK HELPER (v5.16) ──────────────────────────────────
+// flashSaveThenClose — now a simple direct wrapper (no setTimeout)
+// The 420ms animation was causing unreliable modal closing across browsers.
 function flashSaveThenClose(modalId, cb){
-  try{
-    const footer=document.querySelector('#'+modalId+' .modal-footer');
-    const btn=footer?footer.querySelector('.btn-primary'):null;
-    if(btn){
-      const origHtml=btn.innerHTML;
-      const origDisabled=btn.disabled;
-      const origStyle=btn.getAttribute('style')||'';
-      btn.innerHTML='✓ Αποθηκεύτηκε!';
-      btn.disabled=true;
-      btn.style.cssText='background:#15803d !important;border-color:#15803d !important;color:#fff !important;transform:none';
-      setTimeout(function(){
-        try{
-          btn.innerHTML=origHtml;
-          btn.disabled=origDisabled;
-          btn.setAttribute('style',origStyle);
-        }catch(e){}
-        closeModal(modalId);
-        if(cb) cb();
-      }, 420);
-    } else {
-      // Δεν βρέθηκε btn — κλείσε αμέσως
-      closeModal(modalId);
-      if(cb) cb();
-    }
-  }catch(e){
-    console.error('flashSaveThenClose error:',e);
-    closeModal(modalId); // guaranteed close
-    if(cb) cb();
-  }
+  try{ closeModal(modalId); }catch(e){ console.error('closeModal:',e); }
+  try{ if(cb) cb(); }catch(e){ console.error('flashSaveThenClose cb:',e); }
 }
-// ──────────────────────────────────────────────────────────────────
 
 function toast(msg,type='success'){
   const el=document.getElementById('toast');
@@ -5532,7 +5586,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.15</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.16</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
