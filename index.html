@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.16
+  Έκδοση: v5.17
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.16</title>
+<title>Μητρώο Εγκαταστάσεων v5.17</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -798,7 +798,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.16</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.17</p>
   </div>
 </div>
 
@@ -806,7 +806,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.16</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.17</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -2476,7 +2476,7 @@ let _serverRole  = sessionStorage.getItem('srv_role')  || 'user';
 
 // API helper
 async function apiCall(method, endpoint, data) {
-  if(!SERVER_MODE) return null;
+  if(typeof SERVER_MODE === 'undefined' || !SERVER_MODE) return null;
   try {
     const opts = {
       method,
@@ -2498,7 +2498,7 @@ async function apiCall(method, endpoint, data) {
 
 // Server-aware save
 async function saveToServer(key, data) {
-  if(!SERVER_MODE) return;
+  if(typeof SERVER_MODE === 'undefined' || !SERVER_MODE) return;
   await apiCall('POST', '/data/' + key, data);
 }
 
@@ -2547,8 +2547,8 @@ function save(key,data){
     }
     // Πάντα στο localStorage ανεξάρτητα από Firebase
   }
-  // LAN server fallback
-  if(SERVER_MODE && !USE_FIREBASE) saveToServer(key,data);
+  // LAN server fallback (disabled in v5 — SERVER_MODE removed)
+  // if(typeof SERVER_MODE !== 'undefined' && SERVER_MODE && !USE_FIREBASE) saveToServer(key,data);
 }
 
 function loadData(){
@@ -2685,7 +2685,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.16',
+    version:'v5.17',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -2734,7 +2734,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.16',
+    version:'v5.17',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -2923,13 +2923,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.16',
+      version:'v5.17',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.16',
+      version:'v5.17',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -5329,7 +5329,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function fmtDate(d){if(!d)return '';try{const[y,m,dy]=d.split('-');return `${dy}/${m}/${y}`;}catch(e){return d;}}
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
 
-// ── SAVE FEEDBACK HELPER (v5.16) ──────────────────────────────────
+// ── SAVE FEEDBACK HELPER (v5.17) ──────────────────────────────────
 // flashSaveThenClose — now a simple direct wrapper (no setTimeout)
 // The 420ms animation was causing unreliable modal closing across browsers.
 function flashSaveThenClose(modalId, cb){
@@ -5586,7 +5586,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.16</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.17</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
