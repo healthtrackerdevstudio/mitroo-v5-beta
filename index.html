@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.17
+  Έκδοση: v5.20
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.17</title>
+<title>Μητρώο Εγκαταστάσεων v5.20</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -646,6 +646,7 @@ table{width:100%;border-collapse:collapse}
 /* ═══════════ END ROUND 3 FIXES ═══════════ */
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 
 // ══ MINI DOCXTEMPLATER v4 (built-in) ══
@@ -798,7 +799,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.17</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.20</p>
   </div>
 </div>
 
@@ -806,7 +807,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.17</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.20</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -960,7 +961,7 @@ const MiniDocGen = {
     <div class="view" id="view-inst">
       <div class="toolbar">
         <span class="toolbar-title">Εγκαταστάσεις</span>
-        <div class="search-box"><span class="search-icon">🔍</span><input id="inst-search" placeholder="ΦΑΚ, επωνυμία, περιοχή, διεύθυνση…" oninput="renderInst()" onkeydown="clearOnEsc(this,'renderInst')"></div>
+        <div class="search-box"><span class="search-icon">🔍</span><input id="inst-search" placeholder="ΦΑΚ, επωνυμία, περιοχή, διεύθυνση…" oninput="debouncedRenderInst()" onkeydown="clearOnEsc(this,'renderInst')"></div>
         <select class="filter-select" id="inst-f-sheet" onchange="renderInst()">
           <option value="">Εγκ. &amp; ΕΧΕΣ</option>
           <option value="inst">Εγκαταστάσεις</option>
@@ -1010,7 +1011,7 @@ const MiniDocGen = {
       <div class="toolbar">
         <span class="toolbar-title">Βιβλίο Πρωτοκόλλου</span>
         <div id="proto-phase-summary" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px"></div>
-        <div class="search-box"><span class="search-icon">🔍</span><input id="proto-search" placeholder="ΦΑΚ, αιτών, αίτημα, αρ.πρωτ.…" oninput="renderProto()" onkeydown="clearOnEsc(this,'renderProto')"></div>
+        <div class="search-box"><span class="search-icon">🔍</span><input id="proto-search" placeholder="ΦΑΚ, αιτών, αίτημα, αρ.πρωτ.…" oninput="debouncedRenderProto()" onkeydown="clearOnEsc(this,'renderProto')"></div>
         <select class="filter-select" id="proto-f-sheet" onchange="renderProto()">
           <option value="">Όλα Τμήματα</option>
           <option value="Εγκαταστάσεις">Εγκαταστάσεις</option>
@@ -1032,8 +1033,8 @@ const MiniDocGen = {
           </div>
         </div>
         <div class="toolbar-spacer"></div>
-        <button class="btn btn-secondary btn-sm" onclick="exportProtoCSV()">⬇ CSV</button>
         <button class="btn btn-secondary btn-sm" onclick="openCleanupModal()" title="Ενοποίηση παραλλαγών λεξιλογίου (Αίτημα / Τελ.Εξ.Ενέργεια)">🧹 Εξυγίανση</button>
+        <button class="btn btn-primary btn-sm" onclick="openPepragmenaModal()" title="Στατιστικά Πεπραγμένων Εξαμήνου">📋 Πεπραγμένα Εξαμήνου</button>
         <button class="btn btn-primary" onclick="openProtoModal()">+ Νέα Κίνηση</button>
       </div>
       <div class="table-wrap">
@@ -1067,7 +1068,7 @@ const MiniDocGen = {
     <div class="view" id="view-certs">
       <div class="toolbar">
         <span class="toolbar-title">Πιστοποιητικά / Στοιχεία & Πιστοποιητικά</span>
-        <div class="search-box"><span class="search-icon">🔍</span><input id="cert-search" placeholder="ΦΑΚ, τύπος πιστοποιητικού…" oninput="renderCerts()" onkeydown="clearOnEsc(this,'renderCerts')"></div>
+        <div class="search-box"><span class="search-icon">🔍</span><input id="cert-search" placeholder="ΦΑΚ, τύπος πιστοποιητικού…" oninput="debouncedRenderCerts()" onkeydown="clearOnEsc(this,'renderCerts')"></div>
         <select class="filter-select" id="cert-f-type" onchange="renderCerts()">
           <option value="">Όλοι τύποι</option>
           <option>Πρατήριο Υγρών Καυσίμων</option>
@@ -1110,7 +1111,7 @@ const MiniDocGen = {
     <div class="view" id="view-equip">
       <div class="toolbar">
         <span class="toolbar-title">Εξοπλισμός</span>
-        <div class="search-box"><span class="search-icon">🔍</span><input id="equip-search" placeholder="ΦΑΚ…" oninput="renderEquip()" onkeydown="clearOnEsc(this,'renderEquip')"></div>
+        <div class="search-box"><span class="search-icon">🔍</span><input id="equip-search" placeholder="ΦΑΚ…" oninput="debouncedRenderEquip()" onkeydown="clearOnEsc(this,'renderEquip')"></div>
         <div class="toolbar-spacer"></div>
         <button class="btn btn-primary" onclick="openEquipModal()">+ Νέα Εγγραφή</button>
       </div>
@@ -2118,6 +2119,77 @@ const MiniDocGen = {
   </div>
 </div>
 
+<!-- ══ MODAL: ΠΕΠΡΑΓΜΕΝΑ ΕΞΑΜΗΝΟΥ ══ -->
+<div class="modal-overlay" id="modal-peprag">
+  <div class="modal" style="max-width:980px">
+    <div class="modal-header">
+      <span class="modal-title">📋 Πεπραγμένα Εξαμήνου</span>
+      <button class="modal-close" onclick="closeModal('modal-peprag')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Period selector -->
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:16px">
+        <div>
+          <label style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:5px">Εξάμηνο</label>
+          <select class="form-control" id="pep-semester" style="min-width:180px" onchange="pepUpdateDates()">
+            <option value="A">1ο Εξάμηνο (Ιαν–Ιούν)</option>
+            <option value="B">2ο Εξάμηνο (Ιούλ–Δεκ)</option>
+            <option value="custom">Προσαρμοσμένο</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:5px">Έτος</label>
+          <select class="form-control" id="pep-year" style="min-width:100px" onchange="pepUpdateDates()"></select>
+        </div>
+        <div id="pep-custom-wrap" style="display:none;display:flex;gap:8px">
+          <div>
+            <label style="font-size:11px;color:#64748b;display:block;margin-bottom:5px">Από</label>
+            <input class="form-control" type="date" id="pep-from">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#64748b;display:block;margin-bottom:5px">Έως</label>
+            <input class="form-control" type="date" id="pep-to">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:4px 0">
+          <span style="font-size:12px;color:#94a3b8" id="pep-range-label"></span>
+        </div>
+        <div class="toolbar-spacer"></div>
+        <button class="btn btn-primary" onclick="calcAndShowPepragmena()">🔄 Υπολογισμός</button>
+      </div>
+
+      <!-- Βάση υπολογισμού -->
+      <div style="margin-bottom:10px;display:flex;gap:16px;font-size:12px;color:#64748b">
+        <span>📅 Βάση: <strong>Ημ. Χρέωσης</strong> (εισερχόμενου)</span>
+        <span id="pep-total-label"></span>
+      </div>
+
+      <!-- Results table -->
+      <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
+        <div style="background:#1a3a6b;color:#fff;padding:10px 16px;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;display:grid;grid-template-columns:44px 1fr 140px 90px 90px 90px">
+          <span>Α/Α</span>
+          <span>Αντικείμενο</span>
+          <span>Κατηγορία</span>
+          <span style="text-align:center">2025Α</span>
+          <span style="text-align:center">2025Β</span>
+          <span style="text-align:center;color:#fde68a" id="pep-col-header">2026Α</span>
+        </div>
+        <div id="pep-results" style="max-height:460px;overflow-y:auto"></div>
+      </div>
+
+      <!-- Note -->
+      <p style="font-size:11px;color:#94a3b8;margin:10px 0 0">
+        💡 Ο υπολογισμός βασίζεται στο πεδίο <strong>Αίτημα</strong> (aitima) των κινήσεων πρωτοκόλλου και στην κατηγορία (ΔΧ/ΙΧ) της αντίστοιχης εγκατάστασης. Ελέγξτε τα αποτελέσματα και προσαρμόστε τα keywords αν χρειαστεί.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-peprag')">Κλείσιμο</button>
+      <button class="btn btn-secondary" onclick="exportPepragmenaCSV()">⬇ CSV</button>
+      <button class="btn btn-primary" onclick="exportPepragmenaXLSX()" id="pep-export-btn" disabled>📊 Εξαγωγή Excel</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 <script>
@@ -2273,7 +2345,10 @@ const LEGACY_SUBTYPE_MAP = {
 
 // ══ STATE ══
 // ══ MIGRATION: Λοιπές+subtype → νέος τύπος ══
+let _migrated=false;
 function migrateInstTypes(){
+  if(_migrated) return; // τρέχει μόνο μια φορά ανά session
+  _migrated=true;
   let changed=0;
   installations.forEach(function(i){
     if(i.type==='Λοιπές Εγκαταστάσεις' && i.subtype){
@@ -2415,6 +2490,245 @@ function cleanupProtoVocab(dryRun){
   });
   return changes;
 }
+
+// ════════════════════════════════════════════════════════════════════
+// ΠΕΠΡΑΓΜΕΝΑ ΕΞΑΜΗΝΟΥ — αυτόματος υπολογισμός από πρωτόκολλο
+// ════════════════════════════════════════════════════════════════════
+
+// Helper: case-insensitive keyword match on a value
+function _pmatch(val){
+  if(!val) return false;
+  const v=_normGr(val);
+  const keys=[].slice.call(arguments,1);
+  return keys.some(function(k){ return v.includes(_normGr(k)); });
+}
+
+// Mapping Excel Α/Α → criteria για αντιστοίχηση με κινήσεις πρωτοκόλλου.
+// fn(p, inst) → true αν η κίνηση ανήκει στη σειρά.
+// ref2025a, ref2025b: γνωστές τιμές για επαλήθευση.
+const PEPRAGMENA_MAP=[
+  // ΠΛΥΝΤΗΡΙΑ - ΛΙΠΑΝΤΗΡΙΑ
+  {aa:11, grp:'Πλυντήρια-Λιπαντήρια',
+   desc:'Γνωστοποίηση (Μεταβολή-Παύση) πλυντηρίου-λιπαντηρίου',
+   ref2025a:0, ref2025b:1,
+   fn:function(p,i){ return _pmatch(p.aitima,'πλυντ','λιπαντ') || (i&&(i.type||'').toLowerCase().includes('πλυν')); }},
+  // ΣΤΕΓΑΣΜΕΝΟΙ ΣΤΑΘΜΟΙ
+  {aa:17, grp:'Στεγασμένοι Σταθμοί',
+   desc:'Έγκριση σχεδιαγραμμάτων στεγασμένου σταθμού',
+   ref2025a:0, ref2025b:1,
+   fn:function(p,i){ return (i&&(i.type||'').toLowerCase().includes('στεγ')) && _pmatch(p.aitima,'εγκρ','σχεδ'); }},
+  {aa:18, grp:'Στεγασμένοι Σταθμοί',
+   desc:'Βεβαίωση Νόμιμης Λειτουργίας στεγ. σταθμού (υλοποίηση)',
+   ref2025a:0, ref2025b:1,
+   fn:function(p,i){ return (i&&(i.type||'').toLowerCase().includes('στεγ')) && _pmatch(p.aitima,'βεβαι','λειτ'); }},
+  // ΠΡΑΤΗΡΙΑ ΔΧ
+  {aa:21, grp:'Πρατήρια ΔΧ',
+   desc:'Άδεια Ίδρυσης πρατηρίου ΔΧ',
+   ref2025a:0, ref2025b:0,
+   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && _pmatch(p.aitima,'ιδρυσ','εγκατ','αδεια ιδρ'); }},
+  {aa:22, grp:'Πρατήρια ΔΧ',
+   desc:'Αρχική ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ πρατηρίου ΔΧ',
+   ref2025a:0, ref2025b:0,
+   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && _pmatch(p.aitima,'αρχικ','πρωτη') && _pmatch(p.aitima,'λειτ'); }},
+  {aa:23, grp:'Πρατήρια ΔΧ',
+   desc:'Έγκριση σχεδίων πρατηρίου ΔΧ',
+   ref2025a:35, ref2025b:29,
+   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && _pmatch(p.aitima,'εγκρ','σχεδ'); }},
+  {aa:24, grp:'Πρατήρια ΔΧ',
+   desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ μετά υλοποίηση ΔΧ',
+   ref2025a:33, ref2025b:32,
+   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && (p.aitima==='ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ'||_pmatch(p.aitima,'αδ λειτ','λειτουργιας')) && !_pmatch(p.aitima,'ιδρυσ','αλλ δικ','ογκομ'); }},
+  {aa:25, grp:'Πρατήρια ΔΧ',
+   desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ λόγω αλλαγής δικαιούχου ΔΧ',
+   ref2025a:5, ref2025b:4,
+   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && (p.aitima==='ΑΛΛ ΔΙΚΑΙΟΥΧΟΥ'||_pmatch(p.aitima,'αλλ δικ','αλλαγ δικ')); }},
+  {aa:26, grp:'Πρατήρια ΔΧ',
+   desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ λόγω νέων Ογκομ. Πινάκων ΔΧ',
+   ref2025a:7, ref2025b:12,
+   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && _pmatch(p.aitima,'ογκομετρ'); }},
+  // ΠΡΑΤΗΡΙΑ ΙΧ
+  {aa:27, grp:'Πρατήρια ΙΧ',
+   desc:'Άδεια Ίδρυσης πρατηρίου ΙΧ',
+   ref2025a:0, ref2025b:4,
+   fn:function(p,i){ return (i&&i.cat==='ΙΧ') && _pmatch(p.aitima,'ιδρυσ','εγκατ'); }},
+  {aa:28, grp:'Πρατήρια ΙΧ',
+   desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ πρατηρίου ΙΧ',
+   ref2025a:0, ref2025b:3,
+   fn:function(p,i){ return (i&&i.cat==='ΙΧ') && (p.aitima==='ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ'||_pmatch(p.aitima,'αδ λειτ','λειτουργιας')); }},
+  // ΑΠΟΦΑΣΕΙΣ
+  {aa:51, grp:'Αποφάσεις',
+   desc:'Απόφαση απαγόρευσης/ανάκλησης/αφαίρεσης Άδειας',
+   ref2025a:0, ref2025b:3,
+   fn:function(p,i){ return _pmatch(p.aitima,'ανακλ','απαγορ','αφαιρ','αναστολ') || _pmatch(p.energeia,'ανακλ','απαγορ','αφαιρ'); }},
+  {aa:52, grp:'Αποφάσεις',
+   desc:'Απόφαση σφράγισης εγκατάστασης',
+   ref2025a:2, ref2025b:3,
+   fn:function(p,i){ return _pmatch(p.aitima,'σφραγ') || _pmatch(p.energeia,'σφραγ'); }},
+  // ΠΕΠΡΑΓΜΕΝΑ
+  {aa:54, grp:'Πεπραγμένα',
+   desc:'Πρότυπες Περιβαλλοντικές Δεσμεύσεις (ΠΠΔ)',
+   ref2025a:35, ref2025b:37,
+   fn:function(p,i){ return _pmatch(p.aitima,'ππδ','περιβαλλ','τακτοπ','πρωτυπ') || _pmatch(p.energeia,'ππδ'); }},
+  {aa:55, grp:'Πεπραγμένα',
+   desc:'Βεβαίωση Ηλεκτρολογικού Ελέγχου (ΒΗΕ)',
+   ref2025a:4, ref2025b:3,
+   fn:function(p,i){ return (p.aitima||'').toUpperCase()==='ΒΗΕ' || (p.energeia||'').toUpperCase()==='ΒΗΕ' || _pmatch(p.aitima,'βηε','ηλεκτρολ'); }},
+  {aa:56, grp:'Πεπραγμένα',
+   desc:'Αυτοψίες',
+   ref2025a:6, ref2025b:8,
+   fn:function(p,i){ return _pmatch(p.aitima,'αυτοψ'); }},
+  {aa:57, grp:'Πεπραγμένα',
+   desc:'Καταγγελίες',
+   ref2025a:10, ref2025b:38,
+   fn:function(p,i){ return _pmatch(p.aitima,'καταγγ'); }},
+  {aa:58, grp:'Έγγραφα',
+   desc:'Έγγραφα (απαντητικά, κλήσεις κτλ)',
+   ref2025a:47, ref2025b:106,
+   fn:function(p,i){ return p.energeia==='ΕΓΓΡΑΦΟ' || _pmatch(p.energeia,'εγγραφ') || _pmatch(p.aitima,'εγγραφ'); }},
+];
+
+let _pepResults=null; // cache for export
+
+function openPepragmenaModal(){
+  // Populate year selector
+  const yearSel=document.getElementById('pep-year');
+  if(yearSel&&!yearSel.options.length){
+    const years=[...new Set(protocol.map(function(p){
+      return p.hm_xreosis?p.hm_xreosis.substring(0,4):'';
+    }).filter(Boolean))].sort().reverse();
+    if(!years.includes('2026')) years.unshift('2026');
+    years.forEach(function(y){
+      const o=document.createElement('option');
+      o.value=y; o.textContent=y;
+      if(y==='2026') o.selected=true;
+      yearSel.appendChild(o);
+    });
+  }
+  pepUpdateDates();
+  openModal('modal-peprag');
+}
+
+function pepUpdateDates(){
+  const sem=document.getElementById('pep-semester').value;
+  const year=document.getElementById('pep-year').value;
+  const customWrap=document.getElementById('pep-custom-wrap');
+  const label=document.getElementById('pep-range-label');
+  if(sem==='custom'){
+    if(customWrap) customWrap.style.display='flex';
+    if(label) label.textContent='';
+  } else {
+    if(customWrap) customWrap.style.display='none';
+    const from=sem==='A'?year+'-01-01':year+'-07-01';
+    const to=sem==='A'?year+'-06-30':year+'-12-31';
+    if(label) label.textContent=fmtDate(from)+' – '+fmtDate(to);
+    document.getElementById('pep-col-header').textContent=year+(sem==='A'?'Α':'Β');
+  }
+}
+
+function calcAndShowPepragmena(){
+  const sem=document.getElementById('pep-semester').value;
+  const year=document.getElementById('pep-year').value;
+  let fromStr,toStr;
+  if(sem==='custom'){
+    fromStr=document.getElementById('pep-from').value;
+    toStr=document.getElementById('pep-to').value;
+    if(!fromStr||!toStr){ toast('Ορίστε ημερομηνίες','error'); return; }
+  } else {
+    fromStr=sem==='A'?year+'-01-01':year+'-07-01';
+    toStr=sem==='A'?year+'-06-30':year+'-12-31';
+  }
+  const from=new Date(fromStr); from.setHours(0,0,0,0);
+  const to=new Date(toStr); to.setHours(23,59,59,999);
+
+  // Build inst lookup
+  const instMap={};
+  installations.forEach(function(i){ instMap[i.fak]=i; });
+
+  // Filter protocol entries in period
+  const inPeriod=protocol.filter(function(p){
+    if(!p.hm_xreosis) return false;
+    const d=new Date(p.hm_xreosis);
+    return d>=from && d<=to;
+  });
+
+  // Count per row
+  _pepResults=PEPRAGMENA_MAP.map(function(row){
+    const matches=inPeriod.filter(function(p){
+      const inst=instMap[p.fak]||null;
+      try{ return row.fn(p,inst); }catch(e){ return false; }
+    });
+    return Object.assign({},row,{count:matches.length, matchedFaks:[...new Set(matches.map(function(p){return p.fak;}))]});
+  });
+
+  // Render
+  const total=inPeriod.length;
+  document.getElementById('pep-total-label').textContent=
+    '📊 Σύνολο κινήσεων στην περίοδο: '+total+
+    ' | Κατηγοριοποιημένες: '+_pepResults.reduce(function(s,r){return s+r.count;},0);
+
+  const colLabel=year+(sem==='A'?'Α':(sem==='B'?'Β':''));
+  document.getElementById('pep-col-header').textContent=colLabel;
+
+  let lastGrp='';
+  document.getElementById('pep-results').innerHTML=_pepResults.map(function(r){
+    const grpRow=r.grp!==lastGrp
+      ?'<div style="background:#f1f5f9;padding:5px 14px;font-size:10px;font-weight:700;color:#1a3a6b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0">'+esc(r.grp)+'</div>'
+      :'';
+    lastGrp=r.grp;
+    const countColor=r.count>0?'#15803d':'#94a3b8';
+    const diffA=r.ref2025a>0?Math.round((r.count-r.ref2025a)/r.ref2025a*100):null;
+    const diffB=r.ref2025b>0?Math.round((r.count-r.ref2025b)/r.ref2025b*100):null;
+    return grpRow+
+      '<div style="display:grid;grid-template-columns:44px 1fr 140px 90px 90px 90px;gap:0;padding:7px 14px;border-bottom:1px solid #f1f5f9;font-size:12px;align-items:center" '+
+      (r.count>0?'title="Κλικ για FAK: '+r.matchedFaks.slice(0,20).join(', ')+(r.matchedFaks.length>20?'…':'')+'"':'')+'>'+
+      '<span style="color:#94a3b8;font-size:11px">'+r.aa+'</span>'+
+      '<span style="color:#1a1f2e">'+esc(r.desc)+'</span>'+
+      '<span style="font-size:10.5px;color:#64748b">'+esc(r.grp)+'</span>'+
+      '<span style="text-align:center;color:#475569">'+r.ref2025a+'</span>'+
+      '<span style="text-align:center;color:#475569">'+r.ref2025b+'</span>'+
+      '<span style="text-align:center;font-weight:700;color:'+countColor+';font-size:14px">'+r.count+
+      (diffA!==null?'<br><span style="font-size:9px;color:'+(diffA>=0?'#15803d':'#dc2626')+';font-weight:400">'+(diffA>=0?'+':'')+diffA+'%</span>':'')+
+      '</span>'+
+      '</div>';
+  }).join('');
+
+  document.getElementById('pep-export-btn').disabled=false;
+}
+
+function exportPepragmenaCSV(){
+  if(!_pepResults){ toast('Κάντε πρώτα Υπολογισμό','warning'); return; }
+  const lines=['Α/Α,Κατηγορία,Αντικείμενο,2025Α,2025Β,'+document.getElementById('pep-col-header').textContent];
+  _pepResults.forEach(function(r){
+    lines.push([r.aa,'"'+r.grp+'"','"'+r.desc+'"',r.ref2025a,r.ref2025b,r.count].join(','));
+  });
+  const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Πεπραγμένα_'+document.getElementById('pep-col-header').textContent+'.csv';
+  a.click();
+  toast('✓ CSV εξήχθη','success');
+}
+
+function exportPepragmenaXLSX(){
+  if(!_pepResults){ toast('Κάντε πρώτα Υπολογισμό','warning'); return; }
+  if(typeof XLSX==='undefined'){ toast('⚠ Βιβλιοθήκη Excel μη διαθέσιμη — δοκιμάστε CSV','warning'); return; }
+  const colLabel=document.getElementById('pep-col-header').textContent;
+  const ws_data=[
+    ['Α/Α','Κατηγορία','Αντικείμενο','2025Α','2025Β',colLabel],
+  ];
+  _pepResults.forEach(function(r){
+    ws_data.push([r.aa,r.grp,r.desc,r.ref2025a,r.ref2025b,r.count]);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(ws_data);
+  // Column widths
+  ws['!cols']=[{wch:6},{wch:22},{wch:54},{wch:10},{wch:10},{wch:12}];
+  // Header style (approximate)
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,'Πεπραγμένα',ws);
+  XLSX.writeFile(wb,'Πεπραγμένα_'+colLabel+'.xlsx');
+  toast('✓ Excel εξήχθη','success');
+}
+// ════════════════════════════════════════════════════════════════════
 
 // Ανοίγει το cleanup modal με preview των αλλαγών
 function openCleanupModal(){
@@ -2685,7 +2999,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.17',
+    version:'v5.20',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -2734,7 +3048,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.17',
+    version:'v5.20',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -2923,13 +3237,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.17',
+      version:'v5.20',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.17',
+      version:'v5.20',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -4088,13 +4402,13 @@ function openProtoModal(id=null,prefillFak=null){
   if(!p&&prefillFak){const i=installations.find(x=>x.fak===prefillFak);if(i&&!f('pf-aition').value)f('pf-aition').value=i.name;}
   f('pf-aitima').value=v('aitima');
   f('pf-proto_eisx').value=v('proto_eisx');
-  f('pf-hm_xreosis').value=v('hm_xreosis');
+  f('pf-hm_xreosis').value=toISODate(v('hm_xreosis'));
   f('pf-mixanikos').value=v('mixanikos');
-  f('pf-hm_exerx').value=v('hm_exerx');
+  f('pf-hm_exerx').value=toISODate(v('hm_exerx'));
   f('pf-energeia').value=v('energeia');
   f('pf-proto_exerx').value=v('proto_exerx');
   f('pf-proto_exerx_link').value=v('proto_exerx_link');
-  f('pf-teliko').value=v('teliko');
+  f('pf-teliko').value=toISODate(v('teliko'));
   f('pf-notes').value=v('notes');
   // Απορρίφθηκε
   const rejCb=f('pf-rejected');
@@ -5165,6 +5479,18 @@ function closeModal(id){
   el.style.display='none';
 }
 // Κλείνει ΟΛΕΣ τις ac-list dropdowns — καλείται πάντα πριν ανοίξει modal
+// ── Debounce: αποτρέπει πολλαπλά renders ανά keystroke ──────────────
+const _db={};
+function debounce(key,fn,delay){
+  clearTimeout(_db[key]);
+  _db[key]=setTimeout(fn, delay||200);
+}
+function debouncedRenderInst(){ debounce('inst',renderInst); }
+function debouncedRenderProto(){ debounce('proto',renderProto); }
+function debouncedRenderCerts(){ debounce('certs',renderCerts); }
+function debouncedRenderEquip(){ debounce('equip',renderEquip); }
+// ────────────────────────────────────────────────────────────────────
+
 function closeAllAcLists(){
   document.querySelectorAll('.ac-list').forEach(function(l){l.classList.remove('show');});
 }
@@ -5326,10 +5652,37 @@ function dlCSV(rows,fn){
 // ══ HELPERS ══
 function uid(){return 'id_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function fmtDate(d){if(!d)return '';try{const[y,m,dy]=d.split('-');return `${dy}/${m}/${y}`;}catch(e){return d;}}
+function fmtDate(d){
+  if(!d) return '';
+  try{
+    // Already dd/mm/yyyy
+    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(String(d))) return d;
+    // yyyy-mm-dd (standard HTML date input)
+    if(/^\d{4}-\d{2}-\d{2}/.test(String(d))){
+      const parts=String(d).substring(0,10).split('-');
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    // Fallback: try Date parsing
+    const dt=new Date(d);
+    if(!isNaN(dt)) return dt.toLocaleDateString('el-GR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    return String(d);
+  }catch(e){return String(d);}
+}
+// Normalizes any date string to yyyy-mm-dd for <input type="date">
+function toISODate(d){
+  if(!d) return '';
+  const s=String(d).trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0,10);
+  // dd/mm/yyyy
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){
+    const[dd,mm,yyyy]=s.split('/');
+    return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+  }
+  return s;
+}
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
 
-// ── SAVE FEEDBACK HELPER (v5.17) ──────────────────────────────────
+// ── SAVE FEEDBACK HELPER (v5.20) ──────────────────────────────────
 // flashSaveThenClose — now a simple direct wrapper (no setTimeout)
 // The 420ms animation was causing unreliable modal closing across browsers.
 function flashSaveThenClose(modalId, cb){
@@ -5586,7 +5939,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.17</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.20</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
