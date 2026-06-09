@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.21
+  Έκδοση: v5.22
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.21</title>
+<title>Μητρώο Εγκαταστάσεων v5.22</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -799,7 +799,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.21</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.22</p>
   </div>
 </div>
 
@@ -807,7 +807,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.21</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.22</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -1954,13 +1954,23 @@ const MiniDocGen = {
           <button type="button" class="btn btn-secondary btn-sm" onclick="addPumpRow()" style="margin-top:6px;width:fit-content">+ Προσθήκη Αντλίας/Διανομέα</button>
         </div>
 
-        <div class="form-group">
-          <label>Φορτιστές ΗΕΟ</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input class="form-control" type="number" id="ef-fortistes" min="0" placeholder="Αρ. Φορτιστών" style="flex:1">
-            <input class="form-control" type="number" id="ef-fortistes-theseis" min="0" placeholder="Αρ. Θέσεων" style="flex:1" title="Αριθμός θέσεων φόρτισης">
+        <!-- Φορτιστές ΗΕΟ -->
+        <div class="form-group ff form-section">
+          <div class="form-section-title">⚡ Φορτιστές ΗΕΟ</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end">
+            <div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Αριθμός Φορτιστών</div>
+              <input class="form-control" type="number" id="ef-fortistes" min="0" placeholder="π.χ. 2">
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Θέσεις Φόρτισης</div>
+              <input class="form-control" type="number" id="ef-fortistes-theseis" min="0" placeholder="π.χ. 4" title="Αριθμός θέσεων φόρτισης">
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Συνολική Ισχύς (kW)</div>
+              <input class="form-control" type="number" id="ef-fortistes-ischys" min="0" step="0.1" placeholder="π.χ. 44" title="Συνολική ισχύς φορτιστών σε kW">
+            </div>
           </div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><span>Φορτιστές</span><span>Θέσεις φόρτισης</span></div>
         </div>
 
         <!-- Δεξαμενές -->
@@ -2991,7 +3001,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.21',
+    version:'v5.22',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -3040,7 +3050,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.21',
+    version:'v5.22',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -3229,13 +3239,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.21',
+      version:'v5.22',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.21',
+      version:'v5.22',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -5185,7 +5195,9 @@ function renderEquip(){
 
     // ── ΗΕΟ (φορτιστές) ──────────────────────────────────────────
     const heoCell=e.fortistes
-      ? `<div class="eq-num">${esc(e.fortistes)}</div>${e.fortistes_theseis?`<div class="eq-num-sub">${esc(e.fortistes_theseis)} θέσ.</div>`:''}`
+      ? `<div class="eq-num">${esc(e.fortistes)}</div>`+
+        (e.fortistes_theseis?`<div class="eq-num-sub">${esc(e.fortistes_theseis)} θέσ.</div>`:'')+
+        (e.fortistes_ischys?`<div class="eq-num-sub">${esc(e.fortistes_ischys)} kW</div>`:'')
       : '<span class="eq-empty">—</span>';
 
     // ── ΕΞΤΡΑ ───────────────────────────────────────────────────
@@ -5254,7 +5266,11 @@ function openEquipModal(fak=null){
   if(pumps.length) pumps.forEach(p=>addPumpRow(p.type,p.eidos,p.products,p.epistomia));
   else addPumpRow();
   f('ef-fortistes').value=eq.fortistes||'';
-  f('ef-plyntirio').checked=!!eq.plyntirio;
+  // Load fortistes_theseis and ischys (may be missing in older records)
+  const ftSel=document.getElementById('ef-fortistes-theseis');
+  if(ftSel) ftSel.value=eq.fortistes_theseis||'';
+  const fiSel=document.getElementById('ef-fortistes-ischys');
+  if(fiSel) fiSel.value=eq.fortistes_ischys||'';
   f('ef-lipantirio').checked=!!eq.lipantirio;
   f('ef-anif-plyntirio').checked=!!eq.anif_plyntirio;
   f('ef-anif-lipantirio').checked=!!eq.anif_lipantirio;
@@ -5411,6 +5427,7 @@ function saveEquip(){
     }).filter(function(p){return p.type||p.products;}),
     fortistes:f('ef-fortistes').value,
     fortistes_theseis:f('ef-fortistes-theseis').value,
+    fortistes_ischys:f('ef-fortistes-ischys')?f('ef-fortistes-ischys').value:'',
     tanks,extra_equip,
     plyntirio:f('ef-plyntirio').checked,anif_plyntirio:f('ef-anif-plyntirio').checked,
     plyntirio_pros:f('ef-plyntirio-pros').checked,
@@ -5684,7 +5701,7 @@ function toISODate(d){
 }
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
 
-// ── SAVE FEEDBACK HELPER (v5.21) ──────────────────────────────────
+// ── SAVE FEEDBACK HELPER (v5.22) ──────────────────────────────────
 // flashSaveThenClose — now a simple direct wrapper (no setTimeout)
 // The 420ms animation was causing unreliable modal closing across browsers.
 function flashSaveThenClose(modalId, cb){
@@ -5941,7 +5958,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.21</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.22</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
