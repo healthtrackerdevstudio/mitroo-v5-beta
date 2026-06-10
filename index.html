@@ -10,7 +10,7 @@
   Η εφαρμογή αυτή αναπτύχθηκε για εσωτερική χρήση του τμήματος.
   Απαγορεύεται η αναδημοσίευση ή χρήση χωρίς άδεια του δημιουργού.
 
-  Έκδοση: v5.22
+  Έκδοση: v5.30
   Ημερομηνία: Μάιος 2026
   Επικοινωνία: ilias.papadakis@office365.attica.gov.gr
 =======================================================================
@@ -19,7 +19,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μητρώο Εγκαταστάσεων v5.22</title>
+<title>Μητρώο Εγκαταστάσεων v5.30</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -643,6 +643,10 @@ table{width:100%;border-collapse:collapse}
 [id^="qnav-"].nofak{opacity:0.6}
 [id^="qnav-"].nofak .btn{cursor:not-allowed;color:#94a3b8;background:#f8fafc}
 
+/* Πεπραγμένα tab buttons */
+.pep-tab{background:none;border:none;border-bottom:3px solid transparent;padding:10px 16px;font-size:13px;font-weight:500;color:#64748b;cursor:pointer;transition:color .15s,border-color .15s;margin-bottom:-2px}
+.pep-tab:hover{color:#1a3a6b}
+.pep-tab.active{color:#1a3a6b;border-bottom-color:#e8a020;font-weight:600}
 /* ═══════════ END ROUND 3 FIXES ═══════════ */
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -799,7 +803,7 @@ const MiniDocGen = {
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn btn-primary btn-full login-btn" onclick="doLogin()">Είσοδος</button>
-    <p class="login-footer">© 2026 Η.Π. — v5.22</p>
+    <p class="login-footer">© 2026 Η.Π. — v5.30</p>
   </div>
 </div>
 
@@ -807,7 +811,7 @@ const MiniDocGen = {
 <div id="app" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden">
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.22</span></div>
+    <div class="topbar-brand">Μητρώο Εγκαταστάσεων<span class="topbar-ver">v5.30</span></div>
     <div class="topbar-spacer"></div>
     <span class="topbar-user" id="topbar-user"></span>
     <button class="topbar-btn" id="btn-backup-all" onclick="backupData()" title="Backup όλων των δεδομένων">💾 Backup</button>
@@ -2129,67 +2133,82 @@ const MiniDocGen = {
   </div>
 </div>
 
-<!-- ══ MODAL: ΠΕΠΡΑΓΜΕΝΑ ΕΞΑΜΗΝΟΥ ══ -->
+<!-- ══ MODAL: ΠΕΠΡΑΓΜΕΝΑ ΕΞΑΜΗΝΟΥ (configurable v2) ══ -->
 <div class="modal-overlay" id="modal-peprag">
-  <div class="modal" style="max-width:980px">
+  <div class="modal" style="max-width:1020px">
     <div class="modal-header">
       <span class="modal-title">📋 Πεπραγμένα Εξαμήνου</span>
       <button class="modal-close" onclick="closeModal('modal-peprag')">✕</button>
     </div>
-    <div class="modal-body">
-      <!-- Period selector -->
-      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:16px">
+    <!-- Tab bar -->
+    <div style="display:flex;border-bottom:2px solid #e2e8f0;background:#f8fafc;padding:0 16px">
+      <button class="pep-tab active" id="pep-tab-results"  onclick="pepSwitchTab('results')">📊 Αποτελέσματα</button>
+      <button class="pep-tab"        id="pep-tab-config"   onclick="pepSwitchTab('config')">⚙️ Ρύθμιση Γραμμών</button>
+      <button class="pep-tab"        id="pep-tab-discover" onclick="pepSwitchTab('discover')">🔍 Ανακάλυψη</button>
+    </div>
+
+    <!-- TAB 1: ΑΠΟΤΕΛΕΣΜΑΤΑ -->
+    <div id="pep-panel-results" class="modal-body">
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:14px">
         <div>
-          <label style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:5px">Εξάμηνο</label>
-          <select class="form-control" id="pep-semester" style="min-width:180px" onchange="pepUpdateDates()">
+          <label style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:4px">Εξάμηνο</label>
+          <select class="form-control" id="pep-semester" style="min-width:170px" onchange="pepUpdateDates()">
             <option value="A">1ο Εξάμηνο (Ιαν–Ιούν)</option>
             <option value="B">2ο Εξάμηνο (Ιούλ–Δεκ)</option>
             <option value="custom">Προσαρμοσμένο</option>
           </select>
         </div>
         <div>
-          <label style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:5px">Έτος</label>
-          <select class="form-control" id="pep-year" style="min-width:100px" onchange="pepUpdateDates()"></select>
+          <label style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:4px">Έτος</label>
+          <select class="form-control" id="pep-year" style="min-width:90px" onchange="pepUpdateDates()"></select>
         </div>
-        <div id="pep-custom-wrap" style="display:none;display:flex;gap:8px">
-          <div>
-            <label style="font-size:11px;color:#64748b;display:block;margin-bottom:5px">Από</label>
-            <input class="form-control" type="date" id="pep-from">
-          </div>
-          <div>
-            <label style="font-size:11px;color:#64748b;display:block;margin-bottom:5px">Έως</label>
-            <input class="form-control" type="date" id="pep-to">
-          </div>
+        <div id="pep-custom-wrap" style="display:none;gap:8px">
+          <div><label style="font-size:10px;color:#64748b;display:block;margin-bottom:4px">Από</label><input class="form-control" type="date" id="pep-from"></div>
+          <div><label style="font-size:10px;color:#64748b;display:block;margin-bottom:4px">Έως</label><input class="form-control" type="date" id="pep-to"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;padding:4px 0">
-          <span style="font-size:12px;color:#94a3b8" id="pep-range-label"></span>
-        </div>
+        <span style="font-size:12px;color:#94a3b8" id="pep-range-label"></span>
         <div class="toolbar-spacer"></div>
         <button class="btn btn-primary" onclick="calcAndShowPepragmena()">🔄 Υπολογισμός</button>
       </div>
-
-      <!-- Βάση υπολογισμού -->
-      <div style="margin-bottom:10px;display:flex;gap:16px;font-size:12px;color:#64748b">
-        <span>📅 Βάση: <strong>Ημ. Χρέωσης</strong> (εισερχόμενου)</span>
+      <div style="margin-bottom:8px;display:flex;gap:16px;font-size:12px;color:#64748b">
+        <span>📅 Βάση: <strong>Ημ. Χρέωσης</strong></span>
         <span id="pep-total-label"></span>
       </div>
-
-      <!-- Results table -->
       <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
-        <div style="background:#1a3a6b;color:#fff;padding:10px 16px;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;display:grid;grid-template-columns:44px 1fr 140px 100px">
-          <span>Α/Α</span>
-          <span>Αντικείμενο</span>
-          <span>Κατηγορία</span>
-          <span style="text-align:center" id="pep-col-header">2026Α</span>
+        <div style="background:#1a3a6b;color:#fff;padding:9px 14px;font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;display:grid;grid-template-columns:44px 1fr 130px 90px">
+          <span>Α/Α</span><span>Αντικείμενο</span><span>Κατηγορία</span>
+          <span style="text-align:center;color:#fde68a" id="pep-col-header">2026Α</span>
         </div>
-        <div id="pep-results" style="max-height:460px;overflow-y:auto"></div>
+        <div id="pep-results" style="max-height:440px;overflow-y:auto"></div>
       </div>
-
-      <!-- Note -->
-      <p style="font-size:11px;color:#94a3b8;margin:10px 0 0">
-        💡 Ο υπολογισμός βασίζεται στο πεδίο <strong>Αίτημα</strong> (aitima) των κινήσεων πρωτοκόλλου και στην κατηγορία (ΔΧ/ΙΧ) της αντίστοιχης εγκατάστασης. Ελέγξτε τα αποτελέσματα και προσαρμόστε τα keywords αν χρειαστεί.
-      </p>
     </div>
+
+    <!-- TAB 2: ΡΥΘΜΙΣΗ ΓΡΑΜΜΩΝ -->
+    <div id="pep-panel-config" class="modal-body" style="display:none">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <span style="font-size:12px;color:#64748b;flex:1">Ορισμός γραμμών καταμέτρησης. Λέξεις-κλειδιά χωρισμένες με <code>|</code>. Αντιστοιχούν κανονικοποιημένα (χωρίς τόνους/κεφαλαία).</span>
+        <button class="btn btn-secondary btn-sm" onclick="pepAddRow()">+ Νέα Γραμμή</button>
+        <button class="btn btn-secondary btn-sm" onclick="pepResetConfig()">↺ Προεπιλογές</button>
+        <button class="btn btn-primary btn-sm" onclick="pepSaveConfig()">💾 Αποθήκευση Ρύθμισης</button>
+      </div>
+      <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
+        <div style="background:#1a3a6b;color:#fff;padding:7px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;display:grid;grid-template-columns:28px 42px 120px 1fr 160px 130px 60px 36px">
+          <span>✓</span><span>Α/Α</span><span>Κατηγορία</span><span>Περιγραφή</span>
+          <span title="Λέξεις-κλειδιά στο Αίτημα (|)">Keywords Αιτήματος</span>
+          <span title="Λέξεις-κλειδιά Τελ.Ενέργειας (|)">Keywords Ενέργειας</span>
+          <span>Κατ.Εγκ.</span><span></span>
+        </div>
+        <div id="pep-config-rows" style="max-height:460px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ΑΝΑΚΑΛΥΨΗ -->
+    <div id="pep-panel-discover" class="modal-body" style="display:none">
+      <p style="font-size:12px;color:#64748b;margin:0 0 12px">Μοναδικές τιμές <strong>Αιτήματος</strong> που υπάρχουν στο πρωτόκολλο για την επιλεγμένη περίοδο. Πράσινο = καλύπτεται ήδη από κάποια γραμμή ρύθμισης. Πορτοκαλί = αταίριαστο.</p>
+      <button class="btn btn-secondary btn-sm" onclick="pepDiscover()" style="margin-bottom:12px">🔍 Ανακάλυψη για Επιλεγμένη Περίοδο</button>
+      <div id="pep-discover-results" style="max-height:500px;overflow-y:auto"></div>
+    </div>
+
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-peprag')">Κλείσιμο</button>
       <button class="btn btn-secondary" onclick="exportPepragmenaCSV()">⬇ CSV</button>
@@ -2514,223 +2533,313 @@ function _pmatch(val){
 // Mapping Excel Α/Α → criteria για αντιστοίχηση με κινήσεις πρωτοκόλλου.
 // fn(p, inst) → true αν η κίνηση ανήκει στη σειρά.
 // ref2025a, ref2025b: γνωστές τιμές για επαλήθευση.
-const PEPRAGMENA_MAP=[
-  // ΠΛΥΝΤΗΡΙΑ - ΛΙΠΑΝΤΗΡΙΑ
-  {aa:11, grp:'Πλυντήρια-Λιπαντήρια',
-   desc:'Γνωστοποίηση (Μεταβολή-Παύση) πλυντηρίου-λιπαντηρίου',
-   ref2025a:0, ref2025b:1,
-   fn:function(p,i){ return _pmatch(p.aitima,'πλυντ','λιπαντ') || (i&&(i.type||'').toLowerCase().includes('πλυν')); }},
-  // ΣΤΕΓΑΣΜΕΝΟΙ ΣΤΑΘΜΟΙ
-  {aa:17, grp:'Στεγασμένοι Σταθμοί',
-   desc:'Έγκριση σχεδιαγραμμάτων στεγασμένου σταθμού',
-   ref2025a:0, ref2025b:1,
-   fn:function(p,i){ return (i&&(i.type||'').toLowerCase().includes('στεγ')) && _pmatch(p.aitima,'εγκρ','σχεδ'); }},
-  {aa:18, grp:'Στεγασμένοι Σταθμοί',
-   desc:'Βεβαίωση Νόμιμης Λειτουργίας στεγ. σταθμού (υλοποίηση)',
-   ref2025a:0, ref2025b:1,
-   fn:function(p,i){ return (i&&(i.type||'').toLowerCase().includes('στεγ')) && _pmatch(p.aitima,'βεβαι','λειτ'); }},
-  // ΠΡΑΤΗΡΙΑ ΔΧ
-  {aa:21, grp:'Πρατήρια ΔΧ',
-   desc:'Άδεια Ίδρυσης πρατηρίου ΔΧ',
-   ref2025a:0, ref2025b:0,
-   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && _pmatch(p.aitima,'ιδρυσ','εγκατ','αδεια ιδρ'); }},
-  {aa:22, grp:'Πρατήρια ΔΧ',
-   desc:'Αρχική ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ πρατηρίου ΔΧ',
-   ref2025a:0, ref2025b:0,
-   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && _pmatch(p.aitima,'αρχικ','πρωτη') && _pmatch(p.aitima,'λειτ'); }},
-  {aa:23, grp:'Πρατήρια ΔΧ',
-   desc:'Έγκριση σχεδίων πρατηρίου ΔΧ',
-   ref2025a:35, ref2025b:29,
-   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && _pmatch(p.aitima,'εγκρ','σχεδ'); }},
-  {aa:24, grp:'Πρατήρια ΔΧ',
-   desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ μετά υλοποίηση ΔΧ',
-   ref2025a:33, ref2025b:32,
-   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && (p.aitima==='ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ'||_pmatch(p.aitima,'αδ λειτ','λειτουργιας')) && !_pmatch(p.aitima,'ιδρυσ','αλλ δικ','ογκομ'); }},
-  {aa:25, grp:'Πρατήρια ΔΧ',
-   desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ λόγω αλλαγής δικαιούχου ΔΧ',
-   ref2025a:5, ref2025b:4,
-   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && (p.aitima==='ΑΛΛ ΔΙΚΑΙΟΥΧΟΥ'||_pmatch(p.aitima,'αλλ δικ','αλλαγ δικ')); }},
-  {aa:26, grp:'Πρατήρια ΔΧ',
-   desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ λόγω νέων Ογκομ. Πινάκων ΔΧ',
-   ref2025a:7, ref2025b:12,
-   fn:function(p,i){ return (i&&i.cat==='ΔΧ') && _pmatch(p.aitima,'ογκομετρ'); }},
-  // ΠΡΑΤΗΡΙΑ ΙΧ
-  {aa:27, grp:'Πρατήρια ΙΧ',
-   desc:'Άδεια Ίδρυσης πρατηρίου ΙΧ',
-   ref2025a:0, ref2025b:4,
-   fn:function(p,i){ return (i&&i.cat==='ΙΧ') && _pmatch(p.aitima,'ιδρυσ','εγκατ'); }},
-  {aa:28, grp:'Πρατήρια ΙΧ',
-   desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ πρατηρίου ΙΧ',
-   ref2025a:0, ref2025b:3,
-   fn:function(p,i){ return (i&&i.cat==='ΙΧ') && (p.aitima==='ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ'||_pmatch(p.aitima,'αδ λειτ','λειτουργιας')); }},
-  // ΑΠΟΦΑΣΕΙΣ
-  {aa:51, grp:'Αποφάσεις',
-   desc:'Απόφαση απαγόρευσης/ανάκλησης/αφαίρεσης Άδειας',
-   ref2025a:0, ref2025b:3,
-   fn:function(p,i){ return _pmatch(p.aitima,'ανακλ','απαγορ','αφαιρ','αναστολ') || _pmatch(p.energeia,'ανακλ','απαγορ','αφαιρ'); }},
-  {aa:52, grp:'Αποφάσεις',
-   desc:'Απόφαση σφράγισης εγκατάστασης',
-   ref2025a:2, ref2025b:3,
-   fn:function(p,i){ return _pmatch(p.aitima,'σφραγ') || _pmatch(p.energeia,'σφραγ'); }},
-  // ΠΕΠΡΑΓΜΕΝΑ
-  {aa:54, grp:'Πεπραγμένα',
-   desc:'Πρότυπες Περιβαλλοντικές Δεσμεύσεις (ΠΠΔ)',
-   ref2025a:35, ref2025b:37,
-   fn:function(p,i){ return _pmatch(p.aitima,'ππδ','περιβαλλ','τακτοπ','πρωτυπ') || _pmatch(p.energeia,'ππδ'); }},
-  {aa:55, grp:'Πεπραγμένα',
-   desc:'Βεβαίωση Ηλεκτρολογικού Ελέγχου (ΒΗΕ)',
-   ref2025a:4, ref2025b:3,
-   fn:function(p,i){ return (p.aitima||'').toUpperCase()==='ΒΗΕ' || (p.energeia||'').toUpperCase()==='ΒΗΕ' || _pmatch(p.aitima,'βηε','ηλεκτρολ'); }},
-  {aa:56, grp:'Πεπραγμένα',
-   desc:'Αυτοψίες',
-   ref2025a:6, ref2025b:8,
-   fn:function(p,i){ return _pmatch(p.aitima,'αυτοψ'); }},
-  {aa:57, grp:'Πεπραγμένα',
-   desc:'Καταγγελίες',
-   ref2025a:10, ref2025b:38,
-   fn:function(p,i){ return _pmatch(p.aitima,'καταγγ'); }},
-  {aa:58, grp:'Έγγραφα',
-   desc:'Έγγραφα (απαντητικά, κλήσεις κτλ)',
-   ref2025a:47, ref2025b:106,
-   fn:function(p,i){ return p.energeia==='ΕΓΓΡΑΦΟ' || _pmatch(p.energeia,'εγγραφ') || _pmatch(p.aitima,'εγγραφ'); }},
+// ════════════════════════════════════════════════════════════════════
+// ΠΕΠΡΑΓΜΕΝΑ ΕΞΑΜΗΝΟΥ — Configurable v2 (v5.30)
+// Config stored in localStorage key 'peprag_cfg' as JSON array.
+// Each row: { id, active, aa, grp, desc, kw_aitima, kw_energy, kw_excl, inst_cat }
+// kw_* = pipe-separated normalized keywords (matched via _normGr)
+// ════════════════════════════════════════════════════════════════════
+
+const PEPRAG_DEFAULT_CFG=[
+  {id:'r01',active:true,  aa:11, grp:'Πλυντήρια-Λιπαντήρια',  desc:'Γνωστοποίηση (Μεταβολή-Παύση) πλυντηρίου-λιπαντηρίου', kw_aitima:'πλυντ|λιπαντ', kw_energy:'', kw_excl:'', inst_cat:''},
+  {id:'r02',active:true,  aa:17, grp:'Στεγασμένοι Σταθμοί',    desc:'Έγκριση σχεδιαγραμμάτων στεγασμένου σταθμού',            kw_aitima:'εγκρ|σχεδ',    kw_energy:'', kw_excl:'', inst_cat:''},
+  {id:'r03',active:true,  aa:18, grp:'Στεγασμένοι Σταθμοί',    desc:'Βεβ. Νόμιμης Λειτουργίας στεγ. σταθμού (υλοποίηση)',     kw_aitima:'βεβαι|λειτ',   kw_energy:'', kw_excl:'', inst_cat:''},
+  {id:'r04',active:true,  aa:21, grp:'Πρατήρια ΔΧ',            desc:'Άδεια Ίδρυσης πρατηρίου ΔΧ',                             kw_aitima:'ιδρυσ|εγκατ',  kw_energy:'', kw_excl:'', inst_cat:'ΔΧ'},
+  {id:'r05',active:false, aa:22, grp:'Πρατήρια ΔΧ',            desc:'Αρχική ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ ΔΧ',                               kw_aitima:'αρχικ|πρωτη',  kw_energy:'', kw_excl:'', inst_cat:'ΔΧ'},
+  {id:'r06',active:true,  aa:23, grp:'Πρατήρια ΔΧ',            desc:'Έγκριση σχεδίων πρατηρίου ΔΧ',                           kw_aitima:'εγκρ|σχεδ',    kw_energy:'', kw_excl:'πλυντ|λιπαντ', inst_cat:'ΔΧ'},
+  {id:'r07',active:true,  aa:24, grp:'Πρατήρια ΔΧ',            desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ μετά υλοποίηση ΔΧ',                      kw_aitima:'αδ λειτ|λειτουργιας', kw_energy:'', kw_excl:'ιδρυσ|αλλ δικ|ογκομ', inst_cat:'ΔΧ'},
+  {id:'r08',active:true,  aa:25, grp:'Πρατήρια ΔΧ',            desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ λόγω αλλαγής δικαιούχου ΔΧ',             kw_aitima:'αλλ δικ|αλλαγ δικ', kw_energy:'', kw_excl:'', inst_cat:'ΔΧ'},
+  {id:'r09',active:true,  aa:26, grp:'Πρατήρια ΔΧ',            desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ λόγω νέων Ογκομ. Πινάκων ΔΧ',            kw_aitima:'ογκομετρ',     kw_energy:'', kw_excl:'', inst_cat:'ΔΧ'},
+  {id:'r10',active:true,  aa:27, grp:'Πρατήρια ΙΧ',            desc:'Άδεια Ίδρυσης πρατηρίου ΙΧ',                             kw_aitima:'ιδρυσ|εγκατ',  kw_energy:'', kw_excl:'', inst_cat:'ΙΧ'},
+  {id:'r11',active:true,  aa:28, grp:'Πρατήρια ΙΧ',            desc:'ΑΔ ΛΕΙΤΟΥΡΓΙΑΣ πρατηρίου ΙΧ',                            kw_aitima:'αδ λειτ|λειτουργιας', kw_energy:'', kw_excl:'', inst_cat:'ΙΧ'},
+  {id:'r12',active:true,  aa:51, grp:'Αποφάσεις',              desc:'Απόφαση απαγόρευσης/ανάκλησης/αφαίρεσης Άδειας',         kw_aitima:'ανακλ|απαγορ|αφαιρ', kw_energy:'ανακλ|απαγορ', kw_excl:'', inst_cat:''},
+  {id:'r13',active:true,  aa:52, grp:'Αποφάσεις',              desc:'Απόφαση σφράγισης εγκατάστασης',                          kw_aitima:'σφραγ',         kw_energy:'σφραγ', kw_excl:'', inst_cat:''},
+  {id:'r14',active:true,  aa:54, grp:'Πεπραγμένα',             desc:'Πρότυπες Περιβαλλοντικές Δεσμεύσεις (ΠΠΔ)',              kw_aitima:'ππδ|περιβαλλ|τακτοπ', kw_energy:'ππδ', kw_excl:'', inst_cat:''},
+  {id:'r15',active:true,  aa:55, grp:'Πεπραγμένα',             desc:'Βεβαίωση Ηλεκτρολογικού Ελέγχου (ΒΗΕ)',                 kw_aitima:'βηε|ηλεκτρολ', kw_energy:'βηε', kw_excl:'', inst_cat:''},
+  {id:'r16',active:true,  aa:56, grp:'Πεπραγμένα',             desc:'Αυτοψίες',                                                kw_aitima:'αυτοψ',         kw_energy:'',     kw_excl:'', inst_cat:''},
+  {id:'r17',active:true,  aa:57, grp:'Πεπραγμένα',             desc:'Καταγγελίες',                                             kw_aitima:'καταγγ',        kw_energy:'',     kw_excl:'', inst_cat:''},
+  {id:'r18',active:true,  aa:58, grp:'Έγγραφα',                desc:'Έγγραφα (απαντητικά, κλήσεις κτλ)',                       kw_aitima:'εγγραφ',        kw_energy:'εγγραφ', kw_excl:'', inst_cat:''},
+  {id:'r19',active:true,  aa:82, grp:'ΕΧΕΣ',                   desc:'Οχήματα Ειδικού Σκοπού (ΕΧΕΣ)',                           kw_aitima:'εχεσ|οχημα|αυτοκιν|ιεκ|εξεσ', kw_energy:'', kw_excl:'', inst_cat:''},
+  {id:'r20',active:true,  aa:89, grp:'Αποφάσεις',              desc:'Αποφάσεις Διοικητικών Κυρώσεων',                         kw_aitima:'κυρωσ|προστιμ|διοικ κυρ', kw_energy:'', kw_excl:'', inst_cat:''},
 ];
 
-let _pepResults=null; // cache for export
+// Load or initialize config from localStorage
+function pepGetCfg(){
+  try{ const s=localStorage.getItem('peprag_cfg'); if(s) return JSON.parse(s); }catch(e){}
+  return PEPRAG_DEFAULT_CFG.map(function(r){return Object.assign({},r);});
+}
+function pepSaveCfgToStorage(cfg){
+  try{ localStorage.setItem('peprag_cfg', JSON.stringify(cfg)); }catch(e){}
+}
+
+// Tab switching
+function pepSwitchTab(tab){
+  ['results','config','discover'].forEach(function(t){
+    document.getElementById('pep-panel-'+t).style.display=t===tab?'block':'none';
+    document.getElementById('pep-tab-'+t).classList.toggle('active',t===tab);
+  });
+}
+
+// Matching: returns true if protocol entry p (with installation inst) matches config row r
+function pepMatchRow(p, inst, r){
+  // inst_cat filter
+  if(r.inst_cat && (!inst || inst.cat!==r.inst_cat)) return false;
+  // exclusions: any exclusion keyword in aitima OR energeia → reject
+  if(r.kw_excl){
+    const ex=r.kw_excl.split('|').map(function(k){return k.trim();}).filter(Boolean);
+    if(ex.some(function(k){ return _pmatch(p.aitima,k)||_pmatch(p.energeia,k); })) return false;
+  }
+  // aitima keywords
+  const kwa=r.kw_aitima?r.kw_aitima.split('|').map(function(k){return k.trim();}).filter(Boolean):[];
+  // energeia keywords
+  const kwe=r.kw_energy?r.kw_energy.split('|').map(function(k){return k.trim();}).filter(Boolean):[];
+  if(kwa.length===0 && kwe.length===0) return false; // no keywords = skip
+  const matchA=kwa.length===0 || kwa.some(function(k){ return _pmatch(p.aitima,k)||(p.aitima||'').toUpperCase()===k.toUpperCase(); });
+  const matchE=kwe.length===0 || kwe.some(function(k){ return _pmatch(p.energeia,k)||(p.energeia||'').toUpperCase()===k.toUpperCase(); });
+  // If both specified: either can match (OR). If only one specified: that must match.
+  if(kwa.length>0 && kwe.length>0) return matchA || matchE;
+  return matchA && matchE; // at least the specified one must match
+}
+
+let _pepResults=null;
 
 function openPepragmenaModal(){
-  // Populate year selector
   const yearSel=document.getElementById('pep-year');
   if(yearSel&&!yearSel.options.length){
-    const years=[...new Set(protocol.map(function(p){
-      return p.hm_xreosis?p.hm_xreosis.substring(0,4):'';
-    }).filter(Boolean))].sort().reverse();
+    const years=[...new Set(protocol.map(function(p){ return p.hm_xreosis?p.hm_xreosis.substring(0,4):''; }).filter(Boolean))].sort().reverse();
     if(!years.includes('2026')) years.unshift('2026');
     years.forEach(function(y){
-      const o=document.createElement('option');
-      o.value=y; o.textContent=y;
+      const o=document.createElement('option'); o.value=y; o.textContent=y;
       if(y==='2026') o.selected=true;
       yearSel.appendChild(o);
     });
   }
   pepUpdateDates();
+  pepSwitchTab('results');
   openModal('modal-peprag');
 }
 
 function pepUpdateDates(){
   const sem=document.getElementById('pep-semester').value;
   const year=document.getElementById('pep-year').value;
-  const customWrap=document.getElementById('pep-custom-wrap');
-  const label=document.getElementById('pep-range-label');
+  const cw=document.getElementById('pep-custom-wrap');
+  const lbl=document.getElementById('pep-range-label');
   if(sem==='custom'){
-    if(customWrap) customWrap.style.display='flex';
-    if(label) label.textContent='';
+    if(cw) cw.style.display='flex';
+    if(lbl) lbl.textContent='';
   } else {
-    if(customWrap) customWrap.style.display='none';
+    if(cw) cw.style.display='none';
     const from=sem==='A'?year+'-01-01':year+'-07-01';
-    const to=sem==='A'?year+'-06-30':year+'-12-31';
-    if(label) label.textContent=fmtDate(from)+' – '+fmtDate(to);
+    const to  =sem==='A'?year+'-06-30':year+'-12-31';
+    if(lbl) lbl.textContent=fmtDate(from)+' – '+fmtDate(to);
     document.getElementById('pep-col-header').textContent=year+(sem==='A'?'Α':'Β');
   }
 }
 
-function calcAndShowPepragmena(){
+function pepGetPeriod(){
   const sem=document.getElementById('pep-semester').value;
   const year=document.getElementById('pep-year').value;
-  let fromStr,toStr;
   if(sem==='custom'){
-    fromStr=document.getElementById('pep-from').value;
-    toStr=document.getElementById('pep-to').value;
-    if(!fromStr||!toStr){ toast('Ορίστε ημερομηνίες','error'); return; }
-  } else {
-    fromStr=sem==='A'?year+'-01-01':year+'-07-01';
-    toStr=sem==='A'?year+'-06-30':year+'-12-31';
+    return {from:document.getElementById('pep-from').value, to:document.getElementById('pep-to').value};
   }
+  return {from:sem==='A'?year+'-01-01':year+'-07-01', to:sem==='A'?year+'-06-30':year+'-12-31'};
+}
+
+function calcAndShowPepragmena(){
+  const {from:fromStr,to:toStr}=pepGetPeriod();
+  if(!fromStr||!toStr){toast('Ορίστε ημερομηνίες','error');return;}
   const from=new Date(fromStr); from.setHours(0,0,0,0);
-  const to=new Date(toStr); to.setHours(23,59,59,999);
-
-  // Build inst lookup
-  const instMap={};
-  installations.forEach(function(i){ instMap[i.fak]=i; });
-
-  // Filter protocol entries in period
+  const to=new Date(toStr);     to.setHours(23,59,59,999);
+  const instMap={}; installations.forEach(function(i){instMap[i.fak]=i;});
   const inPeriod=protocol.filter(function(p){
     if(!p.hm_xreosis) return false;
     const d=new Date(p.hm_xreosis);
     return d>=from && d<=to;
   });
-
-  // Count per row
-  _pepResults=PEPRAGMENA_MAP.map(function(row){
-    const matches=inPeriod.filter(function(p){
-      const inst=instMap[p.fak]||null;
-      try{ return row.fn(p,inst); }catch(e){ return false; }
-    });
-    return Object.assign({},row,{count:matches.length, matchedFaks:[...new Set(matches.map(function(p){return p.fak;}))]});
+  const cfg=pepGetCfg().filter(function(r){return r.active;});
+  _pepResults=cfg.map(function(r){
+    const matches=inPeriod.filter(function(p){ return pepMatchRow(p,instMap[p.fak]||null,r); });
+    return Object.assign({},r,{count:matches.length, faks:[...new Set(matches.map(function(p){return p.fak;}))]});
   });
-
-  // Render
-  const total=inPeriod.length;
+  const colLabel=document.getElementById('pep-col-header').textContent;
   document.getElementById('pep-total-label').textContent=
-    '📊 Σύνολο κινήσεων στην περίοδο: '+total+
-    ' | Κατηγοριοποιημένες: '+_pepResults.reduce(function(s,r){return s+r.count;},0);
-
-  const colLabel=year+(sem==='A'?'Α':(sem==='B'?'Β':''));
-  document.getElementById('pep-col-header').textContent=colLabel;
-
+    '📊 Σύνολο κινήσεων: '+inPeriod.length+' | Κατηγοριοποιημένες: '+_pepResults.reduce(function(s,r){return s+r.count;},0);
   let lastGrp='';
   document.getElementById('pep-results').innerHTML=_pepResults.map(function(r){
-    const grpRow=r.grp!==lastGrp
-      ?'<div style="background:#f1f5f9;padding:5px 14px;font-size:10px;font-weight:700;color:#1a3a6b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0">'+esc(r.grp)+'</div>'
-      :'';
+    const grpHdr=r.grp!==lastGrp
+      ?'<div style="background:#f1f5f9;padding:4px 14px;font-size:10px;font-weight:700;color:#1a3a6b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0">'+esc(r.grp)+'</div>':'';
     lastGrp=r.grp;
-    const countColor=r.count>0?'#15803d':'#94a3b8';
-    return grpRow+
-      '<div style="display:grid;grid-template-columns:44px 1fr 140px 100px;gap:0;padding:7px 14px;border-bottom:1px solid #f1f5f9;font-size:12px;align-items:center" '+
-      (r.count>0?'title="FAK: '+r.matchedFaks.slice(0,20).join(', ')+(r.matchedFaks.length>20?'…':'')+'"':'')+'>'+
+    const c=r.count; const cc=c>0?'#15803d':'#94a3b8';
+    return grpHdr+'<div style="display:grid;grid-template-columns:44px 1fr 130px 90px;padding:6px 14px;border-bottom:1px solid #f1f5f9;font-size:12px;align-items:center"'+
+      (c>0?' title="FAK: '+r.faks.slice(0,20).join(', ')+'"':'')+'>'+
       '<span style="color:#94a3b8;font-size:11px">'+r.aa+'</span>'+
-      '<span style="color:#1a1f2e">'+esc(r.desc)+'</span>'+
-      '<span style="font-size:10.5px;color:#64748b">'+esc(r.grp)+'</span>'+
-      '<span style="text-align:center;font-weight:700;color:'+countColor+';font-size:16px">'+r.count+'</span>'+
+      '<span>'+esc(r.desc)+'</span>'+
+      '<span style="font-size:11px;color:#64748b">'+esc(r.grp)+'</span>'+
+      '<span style="text-align:center;font-weight:700;color:'+cc+';font-size:16px">'+c+'</span>'+
       '</div>';
   }).join('');
-
   document.getElementById('pep-export-btn').disabled=false;
 }
 
-function exportPepragmenaCSV(){
-  if(!_pepResults){ toast('Κάντε πρώτα Υπολογισμό','warning'); return; }
-  const lines=['Α/Α,Κατηγορία,Αντικείμενο,2025Α,2025Β,'+document.getElementById('pep-col-header').textContent];
-  _pepResults.forEach(function(r){
-    lines.push([r.aa,'"'+r.grp+'"','"'+r.desc+'"',r.ref2025a,r.ref2025b,r.count].join(','));
+// ── CONFIG TAB ────────────────────────────────────────────────────
+function pepRenderConfig(){
+  const cfg=pepGetCfg();
+  const rows=cfg.map(function(r,idx){
+    const id='peprow_'+idx;
+    return '<div style="display:grid;grid-template-columns:28px 42px 120px 1fr 160px 130px 60px 36px;gap:3px;padding:4px 8px;border-bottom:1px solid #f1f5f9;align-items:center" data-idx="'+idx+'">'+
+      '<input type="checkbox"'+(r.active?' checked':'')+' onchange="pepToggleRow('+idx+',this.checked)" style="margin:0">'+
+      '<input class="form-control" value="'+esc(r.aa)+'" onchange="pepUpdateCell('+idx+',\'aa\',this.value)" style="font-size:11px;padding:3px 5px;text-align:center">'+
+      '<input class="form-control" value="'+esc(r.grp)+'" onchange="pepUpdateCell('+idx+',\'grp\',this.value)" style="font-size:11px;padding:3px 5px">'+
+      '<input class="form-control" value="'+esc(r.desc)+'" onchange="pepUpdateCell('+idx+',\'desc\',this.value)" style="font-size:11px;padding:3px 5px">'+
+      '<input class="form-control" value="'+esc(r.kw_aitima)+'" onchange="pepUpdateCell('+idx+',\'kw_aitima\',this.value)" style="font-size:11px;padding:3px 5px" placeholder="εγκρ|σχεδ|..." title="Λ.κ. Αιτήματος — χωρισμένα με |">'+
+      '<input class="form-control" value="'+esc(r.kw_energy)+'" onchange="pepUpdateCell('+idx+',\'kw_energy\',this.value)" style="font-size:11px;padding:3px 5px" placeholder="εγγραφ|..." title="Λ.κ. Ενέργειας — χωρισμένα με |">'+
+      '<select class="form-control" onchange="pepUpdateCell('+idx+',\'inst_cat\',this.value)" style="font-size:11px;padding:3px 5px">'+
+        '<option value=""'+(r.inst_cat===''?' selected':'')+'>Όλες</option>'+
+        '<option value="ΔΧ"'+(r.inst_cat==='ΔΧ'?' selected':'')+'>ΔΧ</option>'+
+        '<option value="ΙΧ"'+(r.inst_cat==='ΙΧ'?' selected':'')+'>ΙΧ</option>'+
+      '</select>'+
+      '<button class="btn-icon" onclick="pepDeleteRow('+idx+')" title="Διαγραφή" style="color:#dc2626;font-size:14px">🗑</button>'+
+      '</div>';
+  }).join('');
+  document.getElementById('pep-config-rows').innerHTML=rows||'<div style="padding:20px;text-align:center;color:#94a3b8">Καμία γραμμή</div>';
+}
+
+let _pepCfgEditing=pepGetCfg();
+
+function pepUpdateCell(idx,field,val){
+  _pepCfgEditing=pepGetCfg();
+  _pepCfgEditing[idx][field]=field==='active'?Boolean(val):(field==='aa'?Number(val)||0:val);
+}
+function pepToggleRow(idx,checked){
+  _pepCfgEditing=pepGetCfg();
+  _pepCfgEditing[idx].active=checked;
+  pepSaveCfgToStorage(_pepCfgEditing);
+}
+function pepDeleteRow(idx){
+  _pepCfgEditing=pepGetCfg();
+  _pepCfgEditing.splice(idx,1);
+  pepSaveCfgToStorage(_pepCfgEditing);
+  pepRenderConfig();
+  toast('Γραμμή αφαιρέθηκε','info');
+}
+function pepAddRow(){
+  const cfg=pepGetCfg();
+  cfg.push({id:'r'+Date.now(),active:true,aa:cfg.length+1,grp:'Νέα Κατηγορία',desc:'Νέα Γραμμή',
+    kw_aitima:'',kw_energy:'',kw_excl:'',inst_cat:''});
+  pepSaveCfgToStorage(cfg);
+  pepRenderConfig();
+}
+function pepSaveConfig(){
+  // Read current values from DOM inputs
+  const rows=document.querySelectorAll('#pep-config-rows [data-idx]');
+  const cfg=pepGetCfg();
+  rows.forEach(function(row){
+    const idx=parseInt(row.dataset.idx);
+    const inputs=row.querySelectorAll('input,select');
+    if(inputs[0]) cfg[idx].active=inputs[0].checked;
+    if(inputs[1]) cfg[idx].aa=Number(inputs[1].value)||0;
+    if(inputs[2]) cfg[idx].grp=inputs[2].value;
+    if(inputs[3]) cfg[idx].desc=inputs[3].value;
+    if(inputs[4]) cfg[idx].kw_aitima=inputs[4].value.trim();
+    if(inputs[5]) cfg[idx].kw_energy=inputs[5].value.trim();
+    if(inputs[6]) cfg[idx].inst_cat=inputs[6].value;
   });
+  pepSaveCfgToStorage(cfg);
+  toast('✓ Ρύθμιση αποθηκεύτηκε','success');
+}
+function pepResetConfig(){
+  if(!confirm('Επαναφορά στις προεπιλεγμένες γραμμές; Θα χαθούν οι αλλαγές σας.')) return;
+  pepSaveCfgToStorage(PEPRAG_DEFAULT_CFG.map(function(r){return Object.assign({},r);}));
+  pepRenderConfig();
+  toast('✓ Επαναφορά προεπιλογών','info');
+}
+
+// Wire config tab render on click
+document.addEventListener('click',function(e){
+  if(e.target && e.target.id==='pep-tab-config') pepRenderConfig();
+});
+
+// ── DISCOVER TAB ─────────────────────────────────────────────────
+function pepDiscover(){
+  const {from:fromStr,to:toStr}=pepGetPeriod();
+  if(!fromStr||!toStr){toast('Ορίστε ημερομηνίες στο tab Αποτελέσματα','warning');return;}
+  const from=new Date(fromStr); from.setHours(0,0,0,0);
+  const to=new Date(toStr);     to.setHours(23,59,59,999);
+  const inPeriod=protocol.filter(function(p){
+    if(!p.hm_xreosis) return false;
+    const d=new Date(p.hm_xreosis); return d>=from && d<=to;
+  });
+  const instMap={}; installations.forEach(function(i){instMap[i.fak]=i;});
+  // Count aitima values
+  const aitimaCounts={};
+  inPeriod.forEach(function(p){
+    const a=(p.aitima||'(κενό)');
+    aitimaCounts[a]=(aitimaCounts[a]||0)+1;
+  });
+  // Check which are matched by config
+  const cfg=pepGetCfg().filter(function(r){return r.active;});
+  const matched={};
+  inPeriod.forEach(function(p){
+    const inst=instMap[p.fak]||null;
+    cfg.forEach(function(r){
+      if(pepMatchRow(p,inst,r)) matched[(p.aitima||'(κενό)')]=r.desc;
+    });
+  });
+  const sorted=Object.entries(aitimaCounts).sort(function(a,b){return b[1]-a[1];});
+  const html=sorted.map(function(kv){
+    const [val,cnt]=kv;
+    const matchedBy=matched[val];
+    const bg=matchedBy?'#f0fdf4':'#fff7ed';
+    const dot=matchedBy?'🟢':'🟠';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:6px 14px;border-bottom:1px solid #f1f5f9;background:'+bg+'">'+
+      '<span style="font-size:16px">'+dot+'</span>'+
+      '<span style="flex:1;font-size:12px;font-weight:500">'+esc(val)+'</span>'+
+      '<span class="badge badge-gray" style="min-width:32px;text-align:center">'+cnt+'</span>'+
+      (matchedBy?'<span style="font-size:11px;color:#15803d;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(matchedBy)+'">→ '+esc(matchedBy)+'</span>':'<button class="btn btn-secondary btn-sm" onclick="pepCreateRowFrom(\''+esc(val)+'\')" style="font-size:11px">+ Νέα Γραμμή</button>')+
+      '</div>';
+  }).join('');
+  document.getElementById('pep-discover-results').innerHTML=
+    '<div style="padding:8px 14px;font-size:11px;color:#64748b;border-bottom:1px solid #e2e8f0">🟢 = καλύπτεται  🟠 = αταίριαστο  |  '+inPeriod.length+' κινήσεις  |  '+sorted.length+' μοναδικά Αιτήματα</div>'+html;
+}
+
+function pepCreateRowFrom(aitima){
+  const cfg=pepGetCfg();
+  cfg.push({id:'r'+Date.now(),active:true,aa:cfg.length+1,grp:'Νέα Κατηγορία',
+    desc:aitima,kw_aitima:_normGr(aitima),kw_energy:'',kw_excl:'',inst_cat:''});
+  pepSaveCfgToStorage(cfg);
+  pepSwitchTab('config');
+  pepRenderConfig();
+  toast('✓ Νέα γραμμή για "'+aitima+'" — ρυθμίστε και αποθηκεύστε','info');
+}
+
+// ── EXPORT ───────────────────────────────────────────────────────
+function exportPepragmenaCSV(){
+  if(!_pepResults){toast('Κάντε πρώτα Υπολογισμό','warning');return;}
+  const col=document.getElementById('pep-col-header').textContent;
+  const lines=['Α/Α,Κατηγορία,Αντικείμενο,'+col];
+  _pepResults.forEach(function(r){ lines.push([r.aa,'"'+r.grp+'"','"'+r.desc+'"',r.count].join(',')); });
   const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='Πεπραγμένα_'+document.getElementById('pep-col-header').textContent+'.csv';
-  a.click();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='Πεπραγμένα_'+col+'.csv'; a.click();
   toast('✓ CSV εξήχθη','success');
 }
 
 function exportPepragmenaXLSX(){
-  if(!_pepResults){ toast('Κάντε πρώτα Υπολογισμό','warning'); return; }
-  if(typeof XLSX==='undefined'){ toast('⚠ Βιβλιοθήκη Excel μη διαθέσιμη — δοκιμάστε CSV','warning'); return; }
-  const colLabel=document.getElementById('pep-col-header').textContent;
-  const ws_data=[
-    ['Α/Α','Κατηγορία','Αντικείμενο','2025Α','2025Β',colLabel],
-  ];
-  _pepResults.forEach(function(r){
-    ws_data.push([r.aa,r.grp,r.desc,r.ref2025a,r.ref2025b,r.count]);
-  });
+  if(!_pepResults){toast('Κάντε πρώτα Υπολογισμό','warning');return;}
+  if(typeof XLSX==='undefined'){toast('⚠ Βιβλιοθήκη Excel μη διαθέσιμη','warning');return;}
+  const col=document.getElementById('pep-col-header').textContent;
+  const ws_data=[['Α/Α','Κατηγορία','Αντικείμενο',col]];
+  _pepResults.forEach(function(r){ ws_data.push([r.aa,r.grp,r.desc,r.count]); });
   const ws=XLSX.utils.aoa_to_sheet(ws_data);
-  // Column widths
-  ws['!cols']=[{wch:6},{wch:22},{wch:54},{wch:10},{wch:10},{wch:12}];
-  // Header style (approximate)
+  ws['!cols']=[{wch:6},{wch:22},{wch:54},{wch:12}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,'Πεπραγμένα',ws);
-  XLSX.writeFile(wb,'Πεπραγμένα_'+colLabel+'.xlsx');
+  XLSX.writeFile(wb,'Πεπραγμένα_'+col+'.xlsx');
   toast('✓ Excel εξήχθη','success');
 }
 // ════════════════════════════════════════════════════════════════════
+
+// Ανοίγει το cleanup modal με preview των αλλαγών
 
 // Ανοίγει το cleanup modal με preview των αλλαγών
 function openCleanupModal(){
@@ -3001,7 +3110,7 @@ function backupShared(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0');
   const payload={
-    version:'v5.22',
+    version:'v5.30',
     exported_at:now.toISOString(),
     type:'shared',
     inst:installations,
@@ -3050,7 +3159,7 @@ function backupData(){
   const now=new Date();
   const ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+''+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+''+String(now.getMinutes()).padStart(2,'0');
   const payload={
-    version:'v5.22',
+    version:'v5.30',
     exported_at:now.toISOString(),
     inst:installations,
     proto:protocol,
@@ -3239,13 +3348,13 @@ function autoBackupOnLogout(){
     // Firebase mode: backup μόνο πρωτόκολλο (τα κοινά είναι στο Firebase)
     // Local mode: backup όλα
     const data = USE_FIREBASE ? {
-      version:'v5.22',
+      version:'v5.30',
       exported: new Date().toISOString(),
       type:'protocol_only',
       user: fbEmail,
       protocol
     } : {
-      version:'v5.22',
+      version:'v5.30',
       exported: new Date().toISOString(),
       type:'full',
       installations,protocol,certificates,equipment
@@ -5701,7 +5810,7 @@ function toISODate(d){
 }
 function clearOnEsc(inp,fn){if(event.key==='Escape'){inp.value='';window[fn]();}}
 
-// ── SAVE FEEDBACK HELPER (v5.22) ──────────────────────────────────
+// ── SAVE FEEDBACK HELPER (v5.30) ──────────────────────────────────
 // flashSaveThenClose — now a simple direct wrapper (no setTimeout)
 // The 420ms animation was causing unreliable modal closing across browsers.
 function flashSaveThenClose(modalId, cb){
@@ -5958,7 +6067,7 @@ function printInstReport(fak){
   }).join('')+'</div>');
   win.document.write('<strong>Δεξαμενές:</strong>'+tanksHtml);
   win.document.write('<h2>📄 Πιστοποιητικά</h2>'+certsHtml);
-  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.22</div>');
+  win.document.write('<div class="footer">© Τεχνικό Τμήμα Μεταφορών — ΠΕ Ανατολικής Αττικής — Μητρώο Πρατηρίων v5.30</div>');
   win.document.write('</body></html>');
   win.document.close();
   win.focus();
